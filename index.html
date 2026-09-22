@@ -62,7 +62,7 @@
 
 <h1>Face Attendance</h1>
 
-<input id="name" type="text" placeholder="Student / Teacher Name">
+<input id="name" type="text" placeholder="Teacher Name">
 
 <br>
 
@@ -83,7 +83,35 @@
 
 <div id="history"></div>
 
-<script>
+<script type="module">
+
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
+  authDomain: "teachers-face-attendance.firebaseapp.com",
+  projectId: "teachers-face-attendance",
+  storageBucket: "teachers-face-attendance.firebasestorage.app",
+  messagingSenderId: "63876838606",
+  appId: "1:63876838606:web:572e240079865aabbc4c9f",
+  measurementId: "G-XN93NKWLY5"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
 
 let stream = null;
 let registeredName = "";
@@ -91,6 +119,7 @@ let registeredDescriptor = null;
 
 const MODEL_URL =
 "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+
 
 async function loadModels() {
 
@@ -103,7 +132,8 @@ async function loadModels() {
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
-    const saved = localStorage.getItem("registeredFace");
+    const saved =
+      localStorage.getItem("registeredFace");
 
     if (saved) {
 
@@ -136,6 +166,7 @@ async function loadModels() {
       "Model loading error";
 
   }
+
 }
 
 
@@ -172,6 +203,7 @@ async function startCamera() {
       "Camera error: " + error.name;
 
   }
+
 }
 
 
@@ -185,7 +217,7 @@ async function registerFace() {
 
   if (!name) {
 
-    alert("Pehle naam likhein.");
+    alert("Pehle teacher ka naam likhein.");
 
     return;
   }
@@ -316,6 +348,9 @@ async function checkFace() {
 
     };
 
+
+    /* Local history */
+
     let history =
       JSON.parse(
         localStorage.getItem("attendanceHistory")
@@ -328,13 +363,35 @@ async function checkFace() {
       JSON.stringify(history)
     );
 
-    document.getElementById("status").innerText =
-      "✅ " +
-      registeredName +
-      " Present\n" +
-      date +
-      " " +
-      time;
+
+    /* Firebase Firestore */
+
+    try {
+
+      await addDoc(
+        collection(db, "attendance"),
+        attendance
+      );
+
+      document.getElementById("status").innerText =
+        "✅ " +
+        registeredName +
+        " Present\n" +
+        date +
+        " " +
+        time +
+        "\n☁️ Firebase mein save ho gaya";
+
+    } catch (error) {
+
+      console.error(error);
+
+      document.getElementById("status").innerText =
+        "Attendance local mein save hui,\n" +
+        "lekin Firebase mein save nahi hui.\n" +
+        error.message;
+
+    }
 
   } else {
 
@@ -342,6 +399,7 @@ async function checkFace() {
       "❌ Face match nahi hua.";
 
   }
+
 }
 
 
@@ -369,7 +427,7 @@ function showHistory() {
   history
     .slice()
     .reverse()
-    .forEach(function(record, index) {
+    .forEach(function(record) {
 
       html +=
         '<div class="record">' +
@@ -397,6 +455,7 @@ function showHistory() {
     });
 
   box.innerHTML = html;
+
 }
 
 
@@ -419,6 +478,7 @@ function clearHistory() {
       "Attendance History clear ho gayi.";
 
   }
+
 }
 
 
