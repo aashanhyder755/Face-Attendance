@@ -3,6 +3,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Attendance</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
   <style>
     body {
       font-family: Arial;
@@ -25,80 +28,196 @@
       font-size: 16px;
     }
 
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 350px;
+    }
+
     #status {
       margin-top: 15px;
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-  <h1>Face Attendance</h1>
+<h1>Face Attendance</h1>
 
-  <video id="camera" autoplay muted playsinline></video>
+<input id="name" type="text" placeholder="Student / Teacher Name">
 
-  <br>
+<br>
 
-  <button onclick="startCamera()">Start Camera</button>
-  <button onclick="stopCamera()">Stop Camera</button>
+<button onclick="startCamera()">Start Camera</button>
+<button onclick="registerFace()">Register Face</button>
+<button onclick="checkFace()">Mark Attendance</button>
 
-  <h2 id="status">Camera not started</h2>
+<br>
 
-  <script>
-    let stream = null;
+<video id="camera" autoplay muted playsinline></video>
 
-    async function startCamera() {
-      const video = document.getElementById("camera");
-      const status = document.getElementById("status");
+<h3 id="status">Loading face recognition...</h3>
 
-      try {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          status.innerText = "Camera is not supported in this browser.";
-          return;
-        }
+<script>
 
-        status.innerText = "Requesting camera permission...";
+let stream = null;
+let registeredDescriptor = null;
+let registeredName = "";
 
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "user",
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          },
-          audio: false
-        });
+const MODEL_URL =
+"https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
-        video.srcObject = stream;
+async function loadModels() {
+  try {
+    document.getElementById("status").innerText =
+      "Loading face recognition models...";
 
-        await video.play();
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
-        status.innerText = "Camera started successfully ✅";
+    document.getElementById("status").innerText =
+      "Models loaded ✅ Start Camera";
 
-      } catch (error) {
-        console.log(error);
+  } catch (error) {
+    console.log(error);
+    document.getElementById("status").innerText =
+      "Model loading error";
+  }
+}
 
-        if (error.name === "NotAllowedError") {
-          status.innerText = "Camera permission denied. Allow camera permission.";
-        } else if (error.name === "NotFoundError") {
-          status.innerText = "No camera found.";
-        } else if (error.name === "NotReadableError") {
-          status.innerText = "Camera is being used by another app.";
-        } else {
-          status.innerText = "Camera error: " + error.name;
-        }
-      }
-    }
+async function startCamera() {
 
-    function stopCamera() {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-        stream = null;
-      }
+  const video = document.getElementById("camera");
 
-      document.getElementById("camera").srcObject = null;
-      document.getElementById("status").innerText = "Camera stopped";
-    }
-  </script>
+  try {
+
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: "user",
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    });
+
+    video.srcObject = stream;
+
+    await video.play();
+
+    document.getElementById("status").innerText =
+      "Camera started ✅";
+
+  } catch (error) {
+
+    document.getElementById("status").innerText =
+      "Camera error: " + error.name;
+
+  }
+}
+
+async function registerFace() {
+
+  const name = document.getElementById("name").value.trim();
+  const video = document.getElementById("camera");
+
+  if (!name) {
+    alert("Pehle naam likhein.");
+    return;
+  }
+
+  if (!stream) {
+    alert("Pehle Start Camera karein.");
+    return;
+  }
+
+  document.getElementById("status").innerText =
+    "Face scan ho raha hai...";
+
+  const detection =
+    await faceapi
+      .detectSingleFace(
+        video,
+        new faceapi.TinyFaceDetectorOptions()
+      )
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+
+  if (!detection) {
+    document.getElementById("status").innerText =
+      "Face detect nahi hua.";
+    return;
+  }
+
+  registeredDescriptor = detection.descriptor;
+  registeredName = name;
+
+  document.getElementById("status").innerText =
+    name + " ka face register ho gaya ✅";
+}
+
+async function checkFace() {
+
+  if (!registeredDescriptor) {
+    alert("Pehle face Register karein.");
+    return;
+  }
+
+  const video = document.getElementById("camera");
+
+  const detection =
+    await faceapi
+      .detectSingleFace(
+        video,
+        new faceapi.TinyFaceDetectorOptions()
+      )
+      .withFaceLandmarks()
+      .withFaceDescriptor();
+
+  if (!detection) {
+    document.getElementById("status").innerText =
+      "Face detect nahi hua.";
+    return;
+  }
+
+  const distance =
+    faceapi.euclideanDistance(
+      registeredDescriptor,
+      detection.descriptor
+    );
+
+  if (distance < 0.55) {
+
+    const now = new Date();
+
+    const record =
+      registeredName +
+      " - Present - " +
+      now.toLocaleString();
+
+    localStorage.setItem(
+      "attendance",
+      record
+    );
+
+    document.getElementById("status").innerText =
+      "✅ " + registeredName +
+      " Present - " +
+      now.toLocaleString();
+
+  } else {
+
+    document.getElementById("status").innerText =
+      "❌ Face match nahi hua.";
+
+  }
+}
+
+loadModels();
+
+</script>
 
 </body>
 </html>
