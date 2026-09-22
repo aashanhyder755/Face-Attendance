@@ -335,7 +335,32 @@ async function checkFace() {
 
     const time =
       now.toLocaleTimeString();
+    
+const snapshot = await getDocs(
+  collection(db, "attendance")
+);
 
+let alreadyMarked = false;
+
+snapshot.forEach((doc) => {
+  const data = doc.data();
+
+  if (
+    data.name === registeredName &&
+    data.date === date &&
+    data.status === "Present"
+  ) {
+    alreadyMarked = true;
+  }
+});
+
+if (alreadyMarked) {
+  document.getElementById("status").innerText =
+    "⚠️ " + registeredName +
+    " ki aaj ki attendance pehle hi lag chuki hai.";
+
+  return;
+}
     const attendance = {
 
       name: registeredName,
