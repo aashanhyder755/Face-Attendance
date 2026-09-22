@@ -38,6 +38,22 @@
     #status {
       margin-top: 15px;
       font-weight: bold;
+      white-space: pre-line;
+    }
+
+    #history {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .record {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -54,9 +70,18 @@
 <button onclick="registerFace()">Register Face</button>
 <button onclick="checkFace()">Mark Attendance</button>
 
+<br>
+
+<button onclick="showHistory()">Attendance History</button>
+<button onclick="clearHistory()">Clear History</button>
+
+<br>
+
 <video id="camera" autoplay muted playsinline></video>
 
 <h3 id="status">Loading...</h3>
+
+<div id="history"></div>
 
 <script>
 
@@ -78,22 +103,29 @@ async function loadModels() {
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
-    // Purani registration load karo
     const saved = localStorage.getItem("registeredFace");
 
     if (saved) {
+
       const data = JSON.parse(saved);
 
       registeredName = data.name;
-      registeredDescriptor = new Float32Array(data.descriptor);
 
-      document.getElementById("name").value = registeredName;
+      registeredDescriptor =
+        new Float32Array(data.descriptor);
+
+      document.getElementById("name").value =
+        registeredName;
 
       document.getElementById("status").innerText =
-        registeredName + " ka face already registered ✅";
+        registeredName +
+        " ka face already registered ✅";
+
     } else {
+
       document.getElementById("status").innerText =
         "Models loaded ✅ Start Camera";
+
     }
 
   } catch (error) {
@@ -106,20 +138,26 @@ async function loadModels() {
   }
 }
 
+
 async function startCamera() {
 
   try {
 
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: "user",
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: false
-    });
+    stream =
+      await navigator.mediaDevices.getUserMedia({
 
-    const video = document.getElementById("camera");
+        video: {
+          facingMode: "user",
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+
+        audio: false
+
+      });
+
+    const video =
+      document.getElementById("camera");
 
     video.srcObject = stream;
 
@@ -136,18 +174,26 @@ async function startCamera() {
   }
 }
 
+
 async function registerFace() {
 
-  const name = document.getElementById("name").value.trim();
-  const video = document.getElementById("camera");
+  const name =
+    document.getElementById("name").value.trim();
+
+  const video =
+    document.getElementById("camera");
 
   if (!name) {
+
     alert("Pehle naam likhein.");
+
     return;
   }
 
   if (!stream) {
+
     alert("Pehle Start Camera dabayein.");
+
     return;
   }
 
@@ -174,7 +220,6 @@ async function registerFace() {
     return;
   }
 
-  // Face descriptor ko permanently save karo
   registeredName = name;
 
   registeredDescriptor =
@@ -183,32 +228,42 @@ async function registerFace() {
   localStorage.setItem(
     "registeredFace",
     JSON.stringify({
+
       name: registeredName,
+
       descriptor: registeredDescriptor
+
     })
   );
 
-  // Array ko wapas Float32Array banao
   registeredDescriptor =
     new Float32Array(registeredDescriptor);
 
   document.getElementById("status").innerText =
-    registeredName + " ka face register ho gaya ✅";
+    registeredName +
+    " ka face register ho gaya ✅";
 
 }
+
 
 async function checkFace() {
 
   if (!registeredDescriptor) {
 
-    alert(
-      "Pehle face Register karein."
-    );
+    alert("Pehle face Register karein.");
 
     return;
   }
 
-  const video = document.getElementById("camera");
+  if (!stream) {
+
+    alert("Pehle Start Camera dabayein.");
+
+    return;
+  }
+
+  const video =
+    document.getElementById("camera");
 
   document.getElementById("status").innerText =
     "Face match ho raha hai...";
@@ -250,15 +305,27 @@ async function checkFace() {
       now.toLocaleTimeString();
 
     const attendance = {
+
       name: registeredName,
+
       status: "Present",
+
       date: date,
+
       time: time
+
     };
 
+    let history =
+      JSON.parse(
+        localStorage.getItem("attendanceHistory")
+      ) || [];
+
+    history.push(attendance);
+
     localStorage.setItem(
-      "attendance",
-      JSON.stringify(attendance)
+      "attendanceHistory",
+      JSON.stringify(history)
     );
 
     document.getElementById("status").innerText =
@@ -276,6 +343,84 @@ async function checkFace() {
 
   }
 }
+
+
+function showHistory() {
+
+  const history =
+    JSON.parse(
+      localStorage.getItem("attendanceHistory")
+    ) || [];
+
+  const box =
+    document.getElementById("history");
+
+  if (history.length === 0) {
+
+    box.innerHTML =
+      "<h3>Attendance History</h3><p>No record found.</p>";
+
+    return;
+  }
+
+  let html =
+    "<h3>Attendance History</h3>";
+
+  history
+    .slice()
+    .reverse()
+    .forEach(function(record, index) {
+
+      html +=
+        '<div class="record">' +
+
+        "<b>Name:</b> " +
+        record.name +
+
+        "<br>" +
+
+        "<b>Status:</b> " +
+        record.status +
+
+        "<br>" +
+
+        "<b>Date:</b> " +
+        record.date +
+
+        "<br>" +
+
+        "<b>Time:</b> " +
+        record.time +
+
+        "</div>";
+
+    });
+
+  box.innerHTML = html;
+}
+
+
+function clearHistory() {
+
+  if (
+    confirm(
+      "Kya aap Attendance History delete karna chahte hain?"
+    )
+  ) {
+
+    localStorage.removeItem(
+      "attendanceHistory"
+    );
+
+    document.getElementById("history").innerHTML =
+      "";
+
+    document.getElementById("status").innerText =
+      "Attendance History clear ho gayi.";
+
+  }
+}
+
 
 loadModels();
 
