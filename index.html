@@ -1,16 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>School Management System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Attendance</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding: 20px;
+    }
+    video {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 10px;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 8px;
+      font-size: 16px;
+    }
+  </style>
 </head>
+
 <body>
-  <h1>School Management System</h1>
-  <p>Welcome</p>
+  <h1>Face Attendance</h1>
 
-  <h2>Student Management</h2>
-  <button>Add Student</button>
+  <video id="camera" autoplay playsinline></video>
 
-  <h2>Fees</h2>
-  <button>Manage Fees</button>
+  <br>
+
+  <button onclick="startCamera()">Start Camera</button>
+  <button onclick="markPresent()">Mark Present</button>
+
+  <h2 id="status">Attendance: Not Marked</h2>
+
+  <script>
+    let stream;
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
+
+        document.getElementById("camera").srcObject = stream;
+        document.getElementById("status").innerText =
+          "Camera started";
+      } catch (error) {
+        document.getElementById("status").innerText =
+          "Camera permission required";
+      }
+    }
+
+    function markPresent() {
+      const now = new Date();
+
+      const date = now.toLocaleDateString();
+      const time = now.toLocaleTimeString();
+
+      localStorage.setItem(
+        "attendance",
+        "Present - " + date + " " + time
+      );
+
+      document.getElementById("status").innerText =
+        "Present: " + date + " " + time;
+    }
+  </script>
 </body>
 </html>
