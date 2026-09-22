@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teacher Attendance Admin Panel</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  background:#f2f2f2;
+  margin:0;
+  padding:15px;
+}
+
+h2{
+  text-align:center;
+  background:#222;
+  color:white;
+  padding:15px;
+  border-radius:8px;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border:0;
+  border-radius:6px;
+  background:#1976d2;
+  color:white;
+  font-size:16px;
+}
+
+#status{
+  text-align:center;
+  margin:10px;
+  font-weight:bold;
+}
+
+.record{
+  background:white;
+  padding:12px;
+  margin:10px 0;
+  border-radius:8px;
+  box-shadow:0 1px 4px #aaa;
+}
+
+.name{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.present{
+  color:green;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Teacher Attendance Admin Panel</h2>
+
+<button onclick="loadAttendance()">🔄 Refresh Attendance</button>
+
+<div id="status">Attendance loading...</div>
+
+<div id="attendanceList"></div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBguAzVWGP_NUyObdv2sreu8pvPycSgzE",
+  authDomain: "teachers-face-attendance.firebaseapp.com",
+  projectId: "teachers-face-attendance",
+  storageBucket: "teachers-face-attendance.firebasestorage.app",
+  messagingSenderId: "63876838606",
+  appId: "1:63876838606:web:572e240079865aabbc4c9f9",
+  measurementId: "G-XN93NKWLY5"
+};
+
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+async function loadAttendance(){
+
+  const list = document.getElementById("attendanceList");
+  const status = document.getElementById("status");
+
+  list.innerHTML = "";
+  status.innerText = "⏳ Loading...";
+
+  try {
+
+    const snapshot =
+      await getDocs(collection(db, "attendance"));
+
+    if(snapshot.empty){
+
+      status.innerText = "No attendance record found.";
+      return;
+
+    }
+
+    let records = [];
+
+    snapshot.forEach((doc) => {
+
+      records.push(doc.data());
+
+    });
+
+
+    records.reverse();
+
+
+    records.forEach((data) => {
+
+      const div = document.createElement("div");
+
+      div.className = "record";
+
+      div.innerHTML = `
+        <div class="name">
+          👨‍🏫 ${data.name || "Unknown"}
+        </div>
+
+        <div>
+          📅 Date: ${data.date || "-"}
+        </div>
+
+        <div>
+          🕐 Time: ${data.time || "-"}
+        </div>
+
+        <div class="present">
+          ✅ Status: ${data.status || "-"}
+        </div>
+      `;
+
+      list.appendChild(div);
+
+    });
+
+
+    status.innerText =
+      "✅ Total Records: " + records.length;
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    status.innerText =
+      "❌ Error: " + error.message;
+
+  }
+
+}
+
+
+window.loadAttendance = loadAttendance;
+
+loadAttendance();
+
+</script>
+
+</body>
+</html>
