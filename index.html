@@ -22,17 +22,17 @@
       object-fit: cover;
     }
 
+    input {
+      padding: 12px;
+      width: 80%;
+      max-width: 350px;
+      font-size: 16px;
+    }
+
     button {
       padding: 12px 20px;
       margin: 8px;
       font-size: 16px;
-    }
-
-    input {
-      padding: 12px;
-      font-size: 16px;
-      width: 80%;
-      max-width: 350px;
     }
 
     #status {
@@ -54,43 +54,59 @@
 <button onclick="registerFace()">Register Face</button>
 <button onclick="checkFace()">Mark Attendance</button>
 
-<br>
-
 <video id="camera" autoplay muted playsinline></video>
 
-<h3 id="status">Loading face recognition...</h3>
+<h3 id="status">Loading...</h3>
 
 <script>
 
 let stream = null;
-let registeredDescriptor = null;
 let registeredName = "";
+let registeredDescriptor = null;
 
 const MODEL_URL =
 "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
 async function loadModels() {
+
   try {
+
     document.getElementById("status").innerText =
-      "Loading face recognition models...";
+      "Loading face recognition...";
 
     await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
-    document.getElementById("status").innerText =
-      "Models loaded ✅ Start Camera";
+    // Purani registration load karo
+    const saved = localStorage.getItem("registeredFace");
+
+    if (saved) {
+      const data = JSON.parse(saved);
+
+      registeredName = data.name;
+      registeredDescriptor = new Float32Array(data.descriptor);
+
+      document.getElementById("name").value = registeredName;
+
+      document.getElementById("status").innerText =
+        registeredName + " ka face already registered ✅";
+    } else {
+      document.getElementById("status").innerText =
+        "Models loaded ✅ Start Camera";
+    }
 
   } catch (error) {
+
     console.log(error);
+
     document.getElementById("status").innerText =
       "Model loading error";
+
   }
 }
 
 async function startCamera() {
-
-  const video = document.getElementById("camera");
 
   try {
 
@@ -103,12 +119,14 @@ async function startCamera() {
       audio: false
     });
 
+    const video = document.getElementById("camera");
+
     video.srcObject = stream;
 
     await video.play();
 
     document.getElementById("status").innerText =
-      "Camera started ✅";
+      "Camera started successfully ✅";
 
   } catch (error) {
 
@@ -129,7 +147,7 @@ async function registerFace() {
   }
 
   if (!stream) {
-    alert("Pehle Start Camera karein.");
+    alert("Pehle Start Camera dabayein.");
     return;
   }
 
@@ -140,45 +158,78 @@ async function registerFace() {
     await faceapi
       .detectSingleFace(
         video,
-        new faceapi.TinyFaceDetectorOptions()
+        new faceapi.TinyFaceDetectorOptions({
+          inputSize: 416,
+          scoreThreshold: 0.5
+        })
       )
       .withFaceLandmarks()
       .withFaceDescriptor();
 
   if (!detection) {
+
     document.getElementById("status").innerText =
       "Face detect nahi hua.";
+
     return;
   }
 
-  registeredDescriptor = detection.descriptor;
+  // Face descriptor ko permanently save karo
   registeredName = name;
 
+  registeredDescriptor =
+    Array.from(detection.descriptor);
+
+  localStorage.setItem(
+    "registeredFace",
+    JSON.stringify({
+      name: registeredName,
+      descriptor: registeredDescriptor
+    })
+  );
+
+  // Array ko wapas Float32Array banao
+  registeredDescriptor =
+    new Float32Array(registeredDescriptor);
+
   document.getElementById("status").innerText =
-    name + " ka face register ho gaya ✅";
+    registeredName + " ka face register ho gaya ✅";
+
 }
 
 async function checkFace() {
 
   if (!registeredDescriptor) {
-    alert("Pehle face Register karein.");
+
+    alert(
+      "Pehle face Register karein."
+    );
+
     return;
   }
 
   const video = document.getElementById("camera");
 
+  document.getElementById("status").innerText =
+    "Face match ho raha hai...";
+
   const detection =
     await faceapi
       .detectSingleFace(
         video,
-        new faceapi.TinyFaceDetectorOptions()
+        new faceapi.TinyFaceDetectorOptions({
+          inputSize: 416,
+          scoreThreshold: 0.5
+        })
       )
       .withFaceLandmarks()
       .withFaceDescriptor();
 
   if (!detection) {
+
     document.getElementById("status").innerText =
       "Face detect nahi hua.";
+
     return;
   }
 
@@ -192,20 +243,31 @@ async function checkFace() {
 
     const now = new Date();
 
-    const record =
-      registeredName +
-      " - Present - " +
-      now.toLocaleString();
+    const date =
+      now.toLocaleDateString();
+
+    const time =
+      now.toLocaleTimeString();
+
+    const attendance = {
+      name: registeredName,
+      status: "Present",
+      date: date,
+      time: time
+    };
 
     localStorage.setItem(
       "attendance",
-      record
+      JSON.stringify(attendance)
     );
 
     document.getElementById("status").innerText =
-      "✅ " + registeredName +
-      " Present - " +
-      now.toLocaleString();
+      "✅ " +
+      registeredName +
+      " Present\n" +
+      date +
+      " " +
+      time;
 
   } else {
 
