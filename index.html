@@ -301,7 +301,8 @@ async function checkFace() {
     "Face match ho raha hai...";
 
   try {
-
+document.getElementById("status").innerText =
+  "Face detection start...";
   const detection =
     await faceapi
       .detectSingleFace(
