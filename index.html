@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Face Attendance</title>
+  <title>Teachers Face Attendance</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
@@ -11,6 +11,26 @@
       font-family: Arial;
       text-align: center;
       padding: 15px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 12px;
+      width: 80%;
+      max-width: 350px;
+      font-size: 16px;
+      margin: 5px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin: 7px;
+      font-size: 16px;
+      cursor: pointer;
     }
 
     video {
@@ -20,19 +40,7 @@
       background: #000;
       border-radius: 12px;
       object-fit: cover;
-    }
-
-    input {
-      padding: 12px;
-      width: 80%;
-      max-width: 350px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 12px 20px;
-      margin: 8px;
-      font-size: 16px;
+      margin-top: 10px;
     }
 
     #status {
@@ -42,15 +50,14 @@
     }
 
     #history {
-      margin-top: 20px;
-      text-align: left;
+      margin: 20px auto;
       max-width: 500px;
-      margin-left: auto;
-      margin-right: auto;
+      text-align: left;
     }
 
     .record {
       border: 1px solid #ccc;
+      background: white;
       padding: 10px;
       margin: 8px 0;
       border-radius: 8px;
@@ -60,121 +67,124 @@
 
 <body>
 
-<h1>Face Attendance</h1>
+<h1>Teachers Face Attendance</h1>
 
 <input id="name" type="text" placeholder="Teacher Name">
 
 <br>
 
-<button onclick="startCamera()">Start Camera</button>
-<button onclick="registerFace()">Register Face</button>
-<button onclick="checkFace()">Mark Attendance</button>
+<button onclick="startCamera()">📷 Start Camera</button>
+<button onclick="registerFace()">➕ Register Teacher Face</button>
 
 <br>
 
-<button onclick="showHistory()">Attendance History</button>
-<button onclick="clearHistory()">Clear History</button>
+<button onclick="checkFace()">✅ Mark Attendance</button>
+
+<br>
+
+<button onclick="showHistory()">📋 Attendance History</button>
+<button onclick="clearHistory()">🗑️ Clear Local History</button>
 
 <br>
 
 <video id="camera" autoplay muted playsinline></video>
 
-<h3 id="status">Loading...</h3>
+<h3 id="status">Loading face recognition...</h3>
 
 <div id="history"></div>
+
 
 <script type="module">
 
 import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 import {
   getFirestore,
   collection,
   addDoc,
   getDocs
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
+
+/* Firebase */
 
 const firebaseConfig = {
 
   apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
-  authDomain: "teachers-face-attendance.firebaseapp.com",
-  projectId: "teachers-face-attendance",
-  storageBucket: "teachers-face-attendance.firebasestorage.app",
-  messagingSenderId: "63876838606",
-  appId: "1:63876838606:web:572e240079865aabbc4c9f",
-  measurementId: "G-XN93NKWLY5"
+
+  authDomain:
+    "teachers-face-attendance.firebaseapp.com",
+
+  projectId:
+    "teachers-face-attendance",
+
+  storageBucket:
+    "teachers-face-attendance.firebasestorage.app",
+
+  messagingSenderId:
+    "63876838606",
+
+  appId:
+    "1:63876838606:web:572e240079865aabbc4c9f",
+
+  measurementId:
+    "G-XN93NKWLY5"
 
 };
 
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
 
-let stream = null;
-let registeredName = "";
-let registeredDescriptor = null;
+/* Variables */
 
+let stream = null;
 
 const MODEL_URL =
-  "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+"https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
+
+/* Load Models */
 
 async function loadModels() {
 
   try {
 
     document.getElementById("status").innerText =
-      "Loading face recognition...";
+      "Face recognition loading...";
 
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+    await faceapi.nets.tinyFaceDetector.loadFromUri(
+      MODEL_URL
+    );
 
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceLandmark68Net.loadFromUri(
+      MODEL_URL
+    );
 
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+    await faceapi.nets.faceRecognitionNet.loadFromUri(
+      MODEL_URL
+    );
 
-
-    const saved =
-      localStorage.getItem("registeredFace");
-
-
-    if (saved) {
-
-      const data = JSON.parse(saved);
-
-      registeredName = data.name;
-
-      registeredDescriptor =
-        new Float32Array(data.descriptor);
-
-      document.getElementById("name").value =
-        registeredName;
-
-      document.getElementById("status").innerText =
-        registeredName +
-        " ka face already registered ✅";
-
-    } else {
-
-      document.getElementById("status").innerText =
-        "Models loaded ✅ Start Camera";
-
-    }
+    document.getElementById("status").innerText =
+      "✅ Models loaded. Camera start karein.";
 
   } catch (error) {
 
     console.error(error);
 
     document.getElementById("status").innerText =
-      "❌ Model loading error: " +
-      error.message;
+      "❌ Model error: " + error.message;
 
   }
 
 }
 
+
+/* Start Camera */
 
 async function startCamera() {
 
@@ -203,20 +213,21 @@ async function startCamera() {
 
 
     document.getElementById("status").innerText =
-      "Camera started successfully ✅";
+      "📷 Camera started successfully ✅";
 
   } catch (error) {
 
     console.error(error);
 
     document.getElementById("status").innerText =
-      "Camera error: " +
-      error.message;
+      "❌ Camera error: " + error.message;
 
   }
 
 }
 
+
+/* Register Teacher */
 
 async function registerFace() {
 
@@ -246,22 +257,22 @@ async function registerFace() {
 
 
   document.getElementById("status").innerText =
-    "Face scan ho raha hai...";
+    "🔍 Face scan ho raha hai...";
 
 
   try {
 
     const detection =
       await faceapi
-        .detectSingleFace(
-          video,
-          new faceapi.TinyFaceDetectorOptions({
-            inputSize: 320,
-            scoreThreshold: 0.4
-          })
-        )
-        .withFaceLandmarks()
-        .withFaceDescriptor();
+      .detectSingleFace(
+        video,
+        new faceapi.TinyFaceDetectorOptions({
+          inputSize: 320,
+          scoreThreshold: 0.4
+        })
+      )
+      .withFaceLandmarks()
+      .withFaceDescriptor();
 
 
     if (!detection) {
@@ -274,31 +285,83 @@ async function registerFace() {
     }
 
 
-    registeredName = name;
-
     const descriptor =
       Array.from(detection.descriptor);
 
 
-    localStorage.setItem(
-      "registeredFace",
-      JSON.stringify({
+    /*
+      Check whether same teacher name
+      already exists
+    */
 
-        name: registeredName,
+    const snapshot =
+      await getDocs(
+        collection(db, "teachers")
+      );
+
+
+    let sameName = false;
+
+
+    snapshot.forEach((doc) => {
+
+      const data = doc.data();
+
+      if (
+        data.name &&
+        data.name.toLowerCase() ===
+        name.toLowerCase()
+      ) {
+
+        sameName = true;
+
+      }
+
+    });
+
+
+    if (sameName) {
+
+      const confirmUpdate =
+        confirm(
+          name +
+          " pehle se registered hai.\n\n" +
+          "Kya face dobara register karna hai?"
+        );
+
+
+      if (!confirmUpdate) {
+
+        document.getElementById("status").innerText =
+          "Registration cancel.";
+
+        return;
+
+      }
+
+    }
+
+
+    /*
+      Save teacher face in Firebase
+    */
+
+    await addDoc(
+      collection(db, "teachers"),
+      {
+
+        name: name,
 
         descriptor: descriptor
 
-      })
+      }
     );
 
 
-    registeredDescriptor =
-      new Float32Array(descriptor);
-
-
     document.getElementById("status").innerText =
-      registeredName +
-      " ka face register ho gaya ✅";
+      "✅ " +
+      name +
+      " ka face Firebase mein register ho gaya.";
 
 
   } catch (error) {
@@ -306,7 +369,7 @@ async function registerFace() {
     console.error(error);
 
     document.getElementById("status").innerText =
-      "❌ Face registration error: " +
+      "❌ Registration error: " +
       error.message;
 
   }
@@ -314,16 +377,9 @@ async function registerFace() {
 }
 
 
+/* Mark Attendance */
+
 async function checkFace() {
-
-  if (!registeredDescriptor) {
-
-    alert("Pehle face Register karein.");
-
-    return;
-
-  }
-
 
   if (!stream) {
 
@@ -342,28 +398,28 @@ async function checkFace() {
 
 
   status.innerText =
-    "Face detection start...";
+    "🔍 Face detect ho raha hai...";
 
 
   try {
 
     const detection =
       await faceapi
-        .detectSingleFace(
-          video,
-          new faceapi.TinyFaceDetectorOptions({
-            inputSize: 320,
-            scoreThreshold: 0.4
-          })
-        )
-        .withFaceLandmarks()
-        .withFaceDescriptor();
+      .detectSingleFace(
+        video,
+        new faceapi.TinyFaceDetectorOptions({
+          inputSize: 320,
+          scoreThreshold: 0.4
+        })
+      )
+      .withFaceLandmarks()
+      .withFaceDescriptor();
 
 
     if (!detection) {
 
       status.innerText =
-        "❌ Face detect nahi hua. Roshni barha kar dobara try karein.";
+        "❌ Face detect nahi hua.";
 
       return;
 
@@ -371,17 +427,85 @@ async function checkFace() {
 
 
     status.innerText =
-      "Face match ho raha hai...";
+      "🔄 Teacher match ho raha hai...";
 
 
-    const distance =
-      faceapi.euclideanDistance(
-        registeredDescriptor,
-        detection.descriptor
+    /*
+      Get all registered teachers
+    */
+
+    const snapshot =
+      await getDocs(
+        collection(db, "teachers")
       );
 
 
-    if (distance >= 0.55) {
+    if (snapshot.empty) {
+
+      status.innerText =
+        "❌ Koi teacher registered nahi hai.";
+
+      return;
+
+    }
+
+
+    let matchedTeacher = null;
+
+    let smallestDistance = 999;
+
+
+    /*
+      Compare face with all teachers
+    */
+
+    snapshot.forEach((doc) => {
+
+      const data = doc.data();
+
+
+      if (
+        data.descriptor &&
+        data.descriptor.length
+      ) {
+
+        const savedDescriptor =
+          new Float32Array(
+            data.descriptor
+          );
+
+
+        const distance =
+          faceapi.euclideanDistance(
+            savedDescriptor,
+            detection.descriptor
+          );
+
+
+        if (
+          distance < smallestDistance
+        ) {
+
+          smallestDistance =
+            distance;
+
+          matchedTeacher = data.name;
+
+        }
+
+      }
+
+    });
+
+
+    /*
+      Face threshold
+    */
+
+    if (
+      !matchedTeacher ||
+      smallestDistance >= 0.55
+    ) {
 
       status.innerText =
         "❌ Face match nahi hua.";
@@ -403,26 +527,26 @@ async function checkFace() {
       now.toLocaleTimeString();
 
 
-    /* Duplicate attendance check */
+    /*
+      Check today's attendance
+    */
 
-    const snapshot =
+    const attendanceSnapshot =
       await getDocs(
         collection(db, "attendance")
       );
 
 
-    let alreadyMarked =
-      false;
+    let alreadyMarked = false;
 
 
-    snapshot.forEach((doc) => {
+    attendanceSnapshot.forEach((doc) => {
 
-      const data =
-        doc.data();
+      const data = doc.data();
 
 
       if (
-        data.name === registeredName &&
+        data.name === matchedTeacher &&
         data.date === date &&
         data.status === "Present"
       ) {
@@ -438,7 +562,7 @@ async function checkFace() {
 
       status.innerText =
         "⚠️ " +
-        registeredName +
+        matchedTeacher +
         " ki aaj ki attendance pehle hi lag chuki hai.";
 
       return;
@@ -446,11 +570,13 @@ async function checkFace() {
     }
 
 
-    /* Attendance record */
+    /*
+      Attendance record
+    */
 
     const attendance = {
 
-      name: registeredName,
+      name: matchedTeacher,
 
       status: "Present",
 
@@ -461,7 +587,19 @@ async function checkFace() {
     };
 
 
-    /* Local history */
+    /*
+      Firebase attendance
+    */
+
+    await addDoc(
+      collection(db, "attendance"),
+      attendance
+    );
+
+
+    /*
+      Local history
+    */
 
     let history =
       JSON.parse(
@@ -480,17 +618,9 @@ async function checkFace() {
     );
 
 
-    /* Firebase */
-
-    await addDoc(
-      collection(db, "attendance"),
-      attendance
-    );
-
-
     status.innerText =
       "✅ " +
-      registeredName +
+      matchedTeacher +
       " Present\n" +
       date +
       " " +
@@ -502,7 +632,6 @@ async function checkFace() {
 
     console.error(error);
 
-
     status.innerText =
       "❌ Error: " +
       error.message;
@@ -511,6 +640,8 @@ async function checkFace() {
 
 }
 
+
+/* Attendance History */
 
 function showHistory() {
 
@@ -542,47 +673,48 @@ function showHistory() {
 
 
   history
-    .slice()
-    .reverse()
-    .forEach(function(record) {
+  .slice()
+  .reverse()
+  .forEach(function(record) {
 
-      html +=
-        '<div class="record">' +
+    html +=
+      '<div class="record">' +
 
-        "<b>Name:</b> " +
-        record.name +
+      "<b>Name:</b> " +
+      record.name +
 
-        "<br>" +
+      "<br>" +
 
-        "<b>Status:</b> " +
-        record.status +
+      "<b>Status:</b> " +
+      record.status +
 
-        "<br>" +
+      "<br>" +
 
-        "<b>Date:</b> " +
-        record.date +
+      "<b>Date:</b> " +
+      record.date +
 
-        "<br>" +
+      "<br>" +
 
-        "<b>Time:</b> " +
-        record.time +
+      "<b>Time:</b> " +
+      record.time +
 
-        "</div>";
+      "</div>";
 
-    });
+  });
 
 
-  box.innerHTML =
-    html;
+  box.innerHTML = html;
 
 }
 
+
+/* Clear Local History */
 
 function clearHistory() {
 
   if (
     confirm(
-      "Kya aap Attendance History delete karna chahte hain?"
+      "Kya aap local Attendance History delete karna chahte hain?"
     )
   ) {
 
@@ -599,14 +731,14 @@ function clearHistory() {
     document.getElementById(
       "status"
     ).innerText =
-      "Attendance History clear ho gayi.";
+      "Local history clear ho gayi.";
 
   }
 
 }
 
 
-/* Start */
+/* Buttons */
 
 window.startCamera =
   startCamera;
@@ -623,6 +755,8 @@ window.showHistory =
 window.clearHistory =
   clearHistory;
 
+
+/* Start */
 
 loadModels();
 
