@@ -4,6 +4,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Attendance Admin</title>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -62,45 +64,22 @@
 
 <div class="controls">
 
-  <input
-    id="teacherSearch"
-    type="text"
-    placeholder="Teacher Name"
-  >
-
+  <input id="teacherSearch" type="text" placeholder="Teacher Name">
   <br>
 
-  <input
-    id="dateSearch"
-    type="text"
-    placeholder="Date e.g. 23/09/2026"
-  >
-
+  <input id="dateSearch" type="text" placeholder="Date e.g. 23/09/2026">
   <br>
 
-  <button id="searchBtn">
-    🔎 Search
-  </button>
-
-  <button id="showAllBtn">
-    🔄 Show All
-  </button>
-
-  <button id="refreshBtn">
-    ☁️ Refresh
-  </button>
-
+  <button id="searchBtn">🔎 Search</button>
+  <button id="showAllBtn">🔄 Show All</button>
+  <button id="refreshBtn">☁️ Refresh</button>
   <br>
 
-  <button id="pdfBtn">
-    📄 Download PDF
-  </button>
+  <button id="pdfBtn">📄 Download PDF</button>
 
 </div>
 
-<div id="status">
-  Attendance loading...
-</div>
+<div id="status">Attendance loading...</div>
 
 <div id="attendanceList"></div>
 
@@ -118,61 +97,35 @@ import {
 from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
-/* Firebase */
-
 const firebaseConfig = {
-
   apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
-
-  authDomain:
-    "teachers-face-attendance.firebaseapp.com",
-
-  projectId:
-    "teachers-face-attendance",
-
-  storageBucket:
-    "teachers-face-attendance.firebasestorage.app",
-
-  messagingSenderId:
-    "63876838606",
-
-  appId:
-    "1:63876838606:web:572e240079865aabbc4c9f",
-
-  measurementId:
-    "G-XN93NKWLY5"
-
+  authDomain: "teachers-face-attendance.firebaseapp.com",
+  projectId: "teachers-face-attendance",
+  storageBucket: "teachers-face-attendance.firebasestorage.app",
+  messagingSenderId: "63876838606",
+  appId: "1:63876838606:web:572e240079865aabbc4c9f",
+  measurementId: "G-XN93NKWLY5"
 };
 
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
 
-/* Data */
-
 let allAttendance = [];
-
 let visibleAttendance = [];
 
 
-/* Load Firebase records */
-
 async function loadAttendance() {
 
-  const status =
-    document.getElementById("status");
+  const status = document.getElementById("status");
 
-  status.innerText =
-    "Attendance loading...";
+  status.innerText = "Attendance loading...";
 
   try {
 
     const snapshot =
-      await getDocs(
-        collection(db, "attendance")
-      );
+      await getDocs(collection(db, "attendance"));
 
     allAttendance = [];
 
@@ -194,14 +147,13 @@ async function loadAttendance() {
 
     });
 
-    visibleAttendance =
-      allAttendance.slice();
+    visibleAttendance = allAttendance.slice();
 
-    displayAttendance(
-      visibleAttendance
-    );
+    displayAttendance(visibleAttendance);
 
-  } catch(error) {
+  }
+
+  catch(error) {
 
     console.error(error);
 
@@ -213,8 +165,6 @@ async function loadAttendance() {
 }
 
 
-/* Display records */
-
 function displayAttendance(records) {
 
   const status =
@@ -223,9 +173,7 @@ function displayAttendance(records) {
   const list =
     document.getElementById("attendanceList");
 
-
-  visibleAttendance =
-    records.slice();
+  visibleAttendance = records.slice();
 
 
   if (records.length === 0) {
@@ -241,42 +189,35 @@ function displayAttendance(records) {
 
 
   status.innerText =
-    "Total Records: " +
-    records.length;
+    "Total Records: " + records.length;
 
 
   let html = "";
 
 
-  records
-    .slice()
-    .reverse()
-    .forEach(function(record) {
+  records.slice().reverse().forEach(function(record) {
 
-      html +=
-        '<div class="record">' +
+    html +=
+      '<div class="record">' +
 
-        "<b>Teacher:</b> " +
-        escapeHTML(record.name) +
+      "<b>Teacher:</b> " +
+      escapeHTML(record.name) +
+      "<br>" +
 
-        "<br>" +
+      "<b>Status:</b> " +
+      escapeHTML(record.status) +
+      "<br>" +
 
-        "<b>Status:</b> " +
-        escapeHTML(record.status) +
+      "<b>Date:</b> " +
+      escapeHTML(record.date) +
+      "<br>" +
 
-        "<br>" +
+      "<b>Time:</b> " +
+      escapeHTML(record.time) +
 
-        "<b>Date:</b> " +
-        escapeHTML(record.date) +
+      "</div>";
 
-        "<br>" +
-
-        "<b>Time:</b> " +
-        escapeHTML(record.time) +
-
-        "</div>";
-
-    });
+  });
 
 
   list.innerHTML = html;
@@ -284,24 +225,16 @@ function displayAttendance(records) {
 }
 
 
-/* SEARCH */
-
 function searchAttendance() {
 
   const teacherInput =
-    document
-      .getElementById("teacherSearch")
-      .value
-      .trim()
-      .toLowerCase();
+    document.getElementById("teacherSearch")
+    .value.trim().toLowerCase();
 
 
   const dateInput =
-    document
-      .getElementById("dateSearch")
-      .value
-      .trim()
-      .toLowerCase();
+    document.getElementById("dateSearch")
+    .value.trim().toLowerCase();
 
 
   const filtered =
@@ -309,14 +242,14 @@ function searchAttendance() {
 
       const recordName =
         String(record.name)
-          .trim()
-          .toLowerCase();
+        .trim()
+        .toLowerCase();
 
 
       const recordDate =
         String(record.date)
-          .trim()
-          .toLowerCase();
+        .trim()
+        .toLowerCase();
 
 
       const nameOK =
@@ -339,232 +272,324 @@ function searchAttendance() {
 }
 
 
-/* Show All */
-
 function showAll() {
 
-  document
-    .getElementById("teacherSearch")
-    .value = "";
+  document.getElementById("teacherSearch").value = "";
 
-  document
-    .getElementById("dateSearch")
-    .value = "";
+  document.getElementById("dateSearch").value = "";
 
-
-  displayAttendance(
-    allAttendance
-  );
+  displayAttendance(allAttendance);
 
 }
 
 
-/* PDF */
+/* =========================
+   PDF DOWNLOAD
+========================= */
 
 function downloadPDF() {
 
-  if (
-    !visibleAttendance ||
-    visibleAttendance.length === 0
-  ) {
+  if (!visibleAttendance ||
+      visibleAttendance.length === 0) {
 
     alert(
       "PDF ke liye koi attendance record nahi mila."
     );
 
     return;
-
   }
 
 
+  if (!window.jspdf) {
+
+    alert(
+      "PDF library load nahi hui. Internet check karein."
+    );
+
+    return;
+  }
+
+
+  const { jsPDF } = window.jspdf;
+
+  const doc = new jsPDF();
+
+
   const teacher =
-    document
-      .getElementById("teacherSearch")
-      .value
-      .trim();
+    document.getElementById("teacherSearch")
+    .value.trim();
 
 
   const date =
-    document
-      .getElementById("dateSearch")
-      .value
-      .trim();
+    document.getElementById("dateSearch")
+    .value.trim();
 
 
-  let title =
-    "Teacher Attendance Report";
+  /* School Name */
+
+  doc.setFontSize(16);
+
+  doc.setFont(undefined, "bold");
+
+  doc.text(
+    "Moon Star Public High School Khanwahan",
+    105,
+    15,
+    { align: "center" }
+  );
+
+
+  /* Report Title */
+
+  doc.setFontSize(13);
+
+  doc.text(
+    "Teacher Attendance Report",
+    105,
+    25,
+    { align: "center" }
+  );
+
+
+  doc.setFont(undefined, "normal");
+
+
+  let y = 38;
 
 
   if (teacher) {
 
-    title +=
-      " - " + teacher;
+    doc.text(
+      "Teacher: " + teacher,
+      10,
+      y
+    );
+
+    y += 7;
 
   }
 
 
   if (date) {
 
-    title +=
-      " - " + date;
-
-  }
-
-
-  let html = `
-
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>${escapeHTML(title)}</title>
-
-<style>
-
-body {
-  font-family: Arial;
-  padding: 25px;
-}
-
-h1 {
-  text-align: center;
-}
-
-h2 {
-  text-align: center;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 25px;
-}
-
-th, td {
-  border: 1px solid #000;
-  padding: 10px;
-  text-align: center;
-}
-
-th {
-  font-weight: bold;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<h1>
-Moon Star Public High School Khanwahan
-</h1>
-
-<h2>
-${escapeHTML(title)}
-</h2>
-
-<table>
-
-<tr>
-
-<th>Teacher</th>
-
-<th>Status</th>
-
-<th>Date</th>
-
-<th>Time</th>
-
-</tr>
-
-`;
-
-
-  visibleAttendance
-    .slice()
-    .reverse()
-    .forEach(function(record) {
-
-      html += `
-
-<tr>
-
-<td>
-${escapeHTML(record.name)}
-</td>
-
-<td>
-${escapeHTML(record.status)}
-</td>
-
-<td>
-${escapeHTML(record.date)}
-</td>
-
-<td>
-${escapeHTML(record.time)}
-</td>
-
-</tr>
-
-`;
-
-    });
-
-
-  html += `
-
-</table>
-
-<p>
-<b>Total Records:</b>
-${visibleAttendance.length}
-</p>
-
-</body>
-
-</html>
-
-`;
-
-
-  const win =
-    window.open("", "_blank");
-
-
-  if (!win) {
-
-    alert(
-      "Popup blocked hai. Browser mein popup allow karein."
+    doc.text(
+      "Date: " + date,
+      10,
+      y
     );
 
-    return;
+    y += 7;
 
   }
 
 
-  win.document.open();
+  doc.text(
+    "Total Records: " +
+    visibleAttendance.length,
+    10,
+    y
+  );
 
-  win.document.write(html);
 
-  win.document.close();
+  y += 10;
 
 
-  setTimeout(function() {
+  /* Table */
 
-    win.print();
+  const startX = 10;
 
-  }, 700);
+  const rowHeight = 9;
+
+
+  const col1 = 65;
+  const col2 = 105;
+  const col3 = 145;
+  const col4 = 200;
+
+
+  function drawHeader() {
+
+    doc.setFont(undefined, "bold");
+
+    doc.rect(
+      startX,
+      y,
+      col1 - startX,
+      rowHeight
+    );
+
+    doc.rect(
+      col1,
+      y,
+      col2 - col1,
+      rowHeight
+    );
+
+    doc.rect(
+      col2,
+      y,
+      col3 - col2,
+      rowHeight
+    );
+
+    doc.rect(
+      col3,
+      y,
+      col4 - col3,
+      rowHeight
+    );
+
+
+    doc.text("Teacher", 12, y + 6);
+
+    doc.text("Status", 67, y + 6);
+
+    doc.text("Date", 107, y + 6);
+
+    doc.text("Time", 147, y + 6);
+
+
+    doc.setFont(undefined, "normal");
+
+    y += rowHeight;
+
+  }
+
+
+  drawHeader();
+
+
+  const rows =
+    visibleAttendance
+    .slice()
+    .reverse();
+
+
+  rows.forEach(function(record, index) {
+
+
+    if (y > 270) {
+
+      doc.addPage();
+
+      y = 20;
+
+      drawHeader();
+
+    }
+
+
+    doc.rect(
+      startX,
+      y,
+      col1 - startX,
+      rowHeight
+    );
+
+    doc.rect(
+      col1,
+      y,
+      col2 - col1,
+      rowHeight
+    );
+
+    doc.rect(
+      col2,
+      y,
+      col3 - col2,
+      rowHeight
+    );
+
+    doc.rect(
+      col3,
+      y,
+      col4 - col3,
+      rowHeight
+    );
+
+
+    let teacherName =
+      String(record.name || "");
+
+
+    if (teacherName.length > 24) {
+
+      teacherName =
+        teacherName.substring(0, 23) + ".";
+
+    }
+
+
+    doc.text(
+      teacherName,
+      12,
+      y + 6
+    );
+
+
+    doc.text(
+      String(record.status || ""),
+      67,
+      y + 6
+    );
+
+
+    doc.text(
+      String(record.date || ""),
+      107,
+      y + 6
+    );
+
+
+    doc.text(
+      String(record.time || ""),
+      147,
+      y + 6
+    );
+
+
+    y += rowHeight;
+
+  });
+
+
+  /* File Name */
+
+  let fileName =
+    "Teacher_Attendance_Report";
+
+
+  if (teacher) {
+
+    fileName +=
+      "_" +
+      teacher.replace(/[^a-zA-Z0-9]/g, "_");
+
+  }
+
+
+  if (date) {
+
+    fileName +=
+      "_" +
+      date.replace(/[^0-9]/g, "_");
+
+  }
+
+
+  fileName += ".pdf";
+
+
+  /* Direct Download */
+
+  doc.save(fileName);
 
 }
 
 
-/* HTML safety */
+/* =========================
+   SECURITY HTML
+========================= */
 
 function escapeHTML(value) {
 
@@ -616,8 +641,6 @@ document
     downloadPDF
   );
 
-
-/* Start */
 
 loadAttendance();
 
