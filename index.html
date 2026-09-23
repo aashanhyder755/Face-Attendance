@@ -91,7 +91,8 @@ import { initializeApp }
 import {
   getFirestore,
   collection,
-  addDoc
+  addDoc,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
@@ -109,7 +110,6 @@ const firebaseConfig = {
 
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
 
@@ -117,8 +117,9 @@ let stream = null;
 let registeredName = "";
 let registeredDescriptor = null;
 
+
 const MODEL_URL =
-"https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+  "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
 
 async function loadModels() {
@@ -129,11 +130,15 @@ async function loadModels() {
       "Loading face recognition...";
 
     await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+
     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+
     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+
 
     const saved =
       localStorage.getItem("registeredFace");
+
 
     if (saved) {
 
@@ -160,10 +165,11 @@ async function loadModels() {
 
   } catch (error) {
 
-    console.log(error);
+    console.error(error);
 
     document.getElementById("status").innerText =
-      "Model loading error";
+      "❌ Model loading error: " +
+      error.message;
 
   }
 
@@ -187,6 +193,7 @@ async function startCamera() {
 
       });
 
+
     const video =
       document.getElementById("camera");
 
@@ -194,13 +201,17 @@ async function startCamera() {
 
     await video.play();
 
+
     document.getElementById("status").innerText =
       "Camera started successfully ✅";
 
   } catch (error) {
 
+    console.error(error);
+
     document.getElementById("status").innerText =
-      "Camera error: " + error.name;
+      "Camera error: " +
+      error.message;
 
   }
 
@@ -215,65 +226,90 @@ async function registerFace() {
   const video =
     document.getElementById("camera");
 
+
   if (!name) {
 
     alert("Pehle teacher ka naam likhein.");
 
     return;
+
   }
+
 
   if (!stream) {
 
     alert("Pehle Start Camera dabayein.");
 
     return;
+
   }
+
 
   document.getElementById("status").innerText =
     "Face scan ho raha hai...";
 
-  const detection =
-    await faceapi
-      .detectSingleFace(
-        video,
-        new faceapi.TinyFaceDetectorOptions({
-          inputSize: 416,
-          scoreThreshold: 0.5
-        })
-      )
-      .withFaceLandmarks()
-      .withFaceDescriptor();
 
-  if (!detection) {
+  try {
+
+    const detection =
+      await faceapi
+        .detectSingleFace(
+          video,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.4
+          })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+
+    if (!detection) {
+
+      document.getElementById("status").innerText =
+        "❌ Face detect nahi hua.";
+
+      return;
+
+    }
+
+
+    registeredName = name;
+
+    const descriptor =
+      Array.from(detection.descriptor);
+
+
+    localStorage.setItem(
+      "registeredFace",
+      JSON.stringify({
+
+        name: registeredName,
+
+        descriptor: descriptor
+
+      })
+    );
+
+
+    registeredDescriptor =
+      new Float32Array(descriptor);
+
 
     document.getElementById("status").innerText =
-      "Face detect nahi hua.";
+      registeredName +
+      " ka face register ho gaya ✅";
 
-    return;
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById("status").innerText =
+      "❌ Face registration error: " +
+      error.message;
+
   }
-
-  registeredName = name;
-
-  registeredDescriptor =
-    Array.from(detection.descriptor);
-
-  localStorage.setItem(
-    "registeredFace",
-    JSON.stringify({
-
-      name: registeredName,
-
-      descriptor: registeredDescriptor
-
-    })
-  );
-
-  registeredDescriptor =
-    new Float32Array(registeredDescriptor);
-
-  document.getElementById("status").innerText =
-    registeredName +
-    " ka face register ho gaya ✅";
 
 }
 
@@ -285,97 +321,133 @@ async function checkFace() {
     alert("Pehle face Register karein.");
 
     return;
+
   }
+
 
   if (!stream) {
 
     alert("Pehle Start Camera dabayein.");
 
     return;
+
   }
+
 
   const video =
     document.getElementById("camera");
 
-  document.getElementById("status").innerText =
-    "Face match ho raha hai...";
+  const status =
+    document.getElementById("status");
+
+
+  status.innerText =
+    "Face detection start...";
+
 
   try {
-document.getElementById("status").innerText =
-  "Face detection start...";
-  const detection =
-    await faceapi
-      .detectSingleFace(
-        video,
-        new faceapi.TinyFaceDetectorOptions({
-          inputSize: 320,
-          scoreThreshold: 0.5
-        })
-      )
-      .withFaceLandmarks()
-      .withFaceDescriptor();
 
-  if (!detection) {
+    const detection =
+      await faceapi
+        .detectSingleFace(
+          video,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.4
+          })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
-    document.getElementById("status").innerText =
-      "Face detect nahi hua.";
 
-    return;
-  }
+    if (!detection) {
 
-  // detection ke baad wala existing code yahan rahega
+      status.innerText =
+        "❌ Face detect nahi hua. Roshni barha kar dobara try karein.";
 
-} catch (error) {
+      return;
 
-  console.error(error);
+    }
 
-  document.getElementById("status").innerText =
-    "Face detection error: " + error.message;
 
-  return;
-}
+    status.innerText =
+      "Face match ho raha hai...";
 
-  const distance =
-    faceapi.euclideanDistance(
-      registeredDescriptor,
-      detection.descriptor
-    );
 
-  if (distance < 0.55) {
+    const distance =
+      faceapi.euclideanDistance(
+        registeredDescriptor,
+        detection.descriptor
+      );
 
-    const now = new Date();
+
+    if (distance >= 0.55) {
+
+      status.innerText =
+        "❌ Face match nahi hua.";
+
+      return;
+
+    }
+
+
+    const now =
+      new Date();
+
 
     const date =
       now.toLocaleDateString();
 
+
     const time =
       now.toLocaleTimeString();
-    
-const snapshot = await getDocs(
-  collection(db, "attendance")
-);
 
-let alreadyMarked = false;
 
-snapshot.forEach((doc) => {
-  const data = doc.data();
+    /* Duplicate attendance check */
 
-  if (
-    data.name === registeredName &&
-    data.date === date &&
-    data.status === "Present"
-  ) {
-    alreadyMarked = true;
-  }
-});
+    const snapshot =
+      await getDocs(
+        collection(db, "attendance")
+      );
 
-if (alreadyMarked) {
-  document.getElementById("status").innerText =
-    "⚠️ " + registeredName +
-    " ki aaj ki attendance pehle hi lag chuki hai.";
 
-  return;
-}
+    let alreadyMarked =
+      false;
+
+
+    snapshot.forEach((doc) => {
+
+      const data =
+        doc.data();
+
+
+      if (
+        data.name === registeredName &&
+        data.date === date &&
+        data.status === "Present"
+      ) {
+
+        alreadyMarked = true;
+
+      }
+
+    });
+
+
+    if (alreadyMarked) {
+
+      status.innerText =
+        "⚠️ " +
+        registeredName +
+        " ki aaj ki attendance pehle hi lag chuki hai.";
+
+      return;
+
+    }
+
+
+    /* Attendance record */
+
     const attendance = {
 
       name: registeredName,
@@ -393,10 +465,14 @@ if (alreadyMarked) {
 
     let history =
       JSON.parse(
-        localStorage.getItem("attendanceHistory")
+        localStorage.getItem(
+          "attendanceHistory"
+        )
       ) || [];
 
+
     history.push(attendance);
+
 
     localStorage.setItem(
       "attendanceHistory",
@@ -404,39 +480,32 @@ if (alreadyMarked) {
     );
 
 
-    /* Firebase Firestore */
+    /* Firebase */
 
-    try {
+    await addDoc(
+      collection(db, "attendance"),
+      attendance
+    );
 
-      await addDoc(
-        collection(db, "attendance"),
-        attendance
-      );
 
-      document.getElementById("status").innerText =
-        "✅ " +
-        registeredName +
-        " Present\n" +
-        date +
-        " " +
-        time +
-        "\n☁️ Firebase mein save ho gaya";
+    status.innerText =
+      "✅ " +
+      registeredName +
+      " Present\n" +
+      date +
+      " " +
+      time +
+      "\n☁️ Firebase mein save ho gaya";
 
-    } catch (error) {
 
-      console.error(error);
+  } catch (error) {
 
-      document.getElementById("status").innerText =
-        "Attendance local mein save hui,\n" +
-        "lekin Firebase mein save nahi hui.\n" +
-        error.message;
+    console.error(error);
 
-    }
 
-  } else {
-
-    document.getElementById("status").innerText =
-      "❌ Face match nahi hua.";
+    status.innerText =
+      "❌ Error: " +
+      error.message;
 
   }
 
@@ -447,22 +516,30 @@ function showHistory() {
 
   const history =
     JSON.parse(
-      localStorage.getItem("attendanceHistory")
+      localStorage.getItem(
+        "attendanceHistory"
+      )
     ) || [];
+
 
   const box =
     document.getElementById("history");
 
+
   if (history.length === 0) {
 
     box.innerHTML =
-      "<h3>Attendance History</h3><p>No record found.</p>";
+      "<h3>Attendance History</h3>" +
+      "<p>No record found.</p>";
 
     return;
+
   }
+
 
   let html =
     "<h3>Attendance History</h3>";
+
 
   history
     .slice()
@@ -492,164 +569,64 @@ function showHistory() {
 
         "</div>";
 
-async function checkFace() {
+    });
 
-  if (!registeredDescriptor) {
-    alert("Pehle face Register karein.");
-    return;
-  }
 
-  if (!stream) {
-    alert("Pehle Start Camera dabayein.");
-    return;
-  }
+  box.innerHTML =
+    html;
 
-  const video = document.getElementById("camera");
-  const status = document.getElementById("status");
+}
 
-  try {
 
-    status.innerText = "Face detection start...";
+function clearHistory() {
 
-    const detection = await Promise.race([
+  if (
+    confirm(
+      "Kya aap Attendance History delete karna chahte hain?"
+    )
+  ) {
 
-      faceapi
-        .detectSingleFace(
-          video,
-          new faceapi.TinyFaceDetectorOptions({
-            inputSize: 320,
-            scoreThreshold: 0.4
-          })
-        )
-        .withFaceLandmarks()
-        .withFaceDescriptor(),
+    localStorage.removeItem(
+      "attendanceHistory"
+    );
 
-      new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error("Face detection timeout")),
-          10000
-        )
-      )
 
-    ]);
+    document.getElementById(
+      "history"
+    ).innerHTML = "";
 
-    if (!detection) {
-      status.innerText =
-        "❌ Face detect nahi hua. Roshni barha kar dobara try karein.";
-      return;
-    }
 
-    const distance =
-      faceapi.euclideanDistance(
-        registeredDescriptor,
-        detection.descriptor
-      );
-
-    if (distance < 0.55) {
-
-      const now = new Date();
-
-      const date =
-        now.toLocaleDateString();
-
-      const time =
-        now.toLocaleTimeString();
-
-      const snapshot = await getDocs(
-        collection(db, "attendance")
-      );
-
-      let alreadyMarked = false;
-
-      snapshot.forEach((doc) => {
-
-        const data = doc.data();
-
-        if (
-          data.name === registeredName &&
-          data.date === date &&
-          data.status === "Present"
-        ) {
-          alreadyMarked = true;
-        }
-
-      });
-
-      if (alreadyMarked) {
-
-        status.innerText =
-          "⚠️ " +
-          registeredName +
-          " ki aaj ki attendance pehle hi lag chuki hai.";
-
-        return;
-      }
-
-      const attendance = {
-
-        name: registeredName,
-
-        status: "Present",
-
-        date: date,
-
-        time: time
-
-      };
-
-      let history =
-        JSON.parse(
-          localStorage.getItem("attendanceHistory")
-        ) || [];
-
-      history.push(attendance);
-
-      localStorage.setItem(
-        "attendanceHistory",
-        JSON.stringify(history)
-      );
-
-      try {
-
-        await addDoc(
-          collection(db, "attendance"),
-          attendance
-        );
-
-        status.innerText =
-          "✅ " +
-          registeredName +
-          " Present\n" +
-          date +
-          " " +
-          time +
-          "\n☁️ Firebase mein save ho gaya";
-
-      } catch (error) {
-
-        console.error(error);
-
-        status.innerText =
-          "Attendance local mein save hui,\n" +
-          "lekin Firebase mein save nahi hui.\n" +
-          error.message;
-
-      }
-
-    } else {
-
-      status.innerText =
-        "❌ Face match nahi hua.";
-
-    }
-
-  } catch (error) {
-
-    console.error(error);
-
-    status.innerText =
-      "⚠️ " + error.message;
+    document.getElementById(
+      "status"
+    ).innerText =
+      "Attendance History clear ho gayi.";
 
   }
 
 }
+
+
+/* Start */
+
+window.startCamera =
+  startCamera;
+
+window.registerFace =
+  registerFace;
+
+window.checkFace =
+  checkFace;
+
+window.showHistory =
+  showHistory;
+
+window.clearHistory =
+  clearHistory;
+
+
+loadModels();
+
+</script>
+
+</body>
+</html>
