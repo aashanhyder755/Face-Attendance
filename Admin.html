@@ -1,656 +1,78 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teacher Attendance Admin</title>
+function downloadPDF() {
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 15px;
-      background: #f5f5f5;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    .controls {
-      text-align: center;
-    }
-
-    input, button {
-      padding: 12px;
-      margin: 5px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
-    input {
-      width: 90%;
-      max-width: 320px;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    #status {
-      font-weight: bold;
-      margin: 15px 0;
-      text-align: center;
-    }
-
-    #attendanceList {
-      max-width: 600px;
-      margin: auto;
-    }
-
-    .record {
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 12px;
-      margin: 8px 0;
-    }
-  </style>
-</head>
-<script>
-function testPDF() {
-  alert("PDF button working hai");
-}
-</script>
-<body>
-
-<h1>📋 Teacher Attendance</h1>
-
-<div class="controls">
-
-  <input id="teacherSearch" type="text" placeholder="Teacher Name">
-  <br>
-
-  <input id="dateSearch" type="text" placeholder="Date e.g. 23/09/2026">
-  <br>
-
-  <button id="searchBtn">🔎 Search</button>
-  <button id="showAllBtn">🔄 Show All</button>
-  <button id="refreshBtn">☁️ Refresh</button>
-  <br>
-
-  <button id="pdfBtn" onclick="testPDF()">
-  📄 Download PDF
-</button>
-
-</div>
-
-<div id="status">Attendance loading...</div>
-
-<div id="attendanceList"></div>
-
-
-<script type="module">
-
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  getDocs
-}
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
-
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
-  authDomain: "teachers-face-attendance.firebaseapp.com",
-  projectId: "teachers-face-attendance",
-  storageBucket: "teachers-face-attendance.firebasestorage.app",
-  messagingSenderId: "63876838606",
-  appId: "1:63876838606:web:572e240079865aabbc4c9f",
-  measurementId: "G-XN93NKWLY5"
-};
-
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-
-let allAttendance = [];
-let visibleAttendance = [];
-
-
-async function loadAttendance() {
-
-  const status = document.getElementById("status");
-
-  status.innerText = "Attendance loading...";
+  if (!visibleAttendance || visibleAttendance.length === 0) {
+    alert("PDF ke liye koi attendance record nahi mila.");
+    return;
+  }
 
   try {
 
-    const snapshot =
-      await getDocs(collection(db, "attendance"));
+    const teacher =
+      document.getElementById("teacherSearch").value.trim();
 
-    allAttendance = [];
+    const date =
+      document.getElementById("dateSearch").value.trim();
 
-    snapshot.forEach(function(doc) {
+    let content = "";
 
-      const data = doc.data();
+    content += "MOON STAR PUBLIC HIGH SCHOOL KHANWAWAN\n";
+    content += "TEACHER ATTENDANCE REPORT\n\n";
 
-      allAttendance.push({
+    if (teacher) {
+      content += "Teacher: " + teacher + "\n";
+    }
 
-        name: data.name || "",
+    if (date) {
+      content += "Date: " + date + "\n";
+    }
 
-        status: data.status || "",
+    content += "\n";
+    content += "Teacher | Status | Date | Time\n";
+    content += "------------------------------------------\n";
 
-        date: data.date || "",
+    visibleAttendance.slice().reverse().forEach(function(record) {
 
-        time: data.time || ""
+      content +=
+        record.name + " | " +
+        record.status + " | " +
+        record.date + " | " +
+        record.time + "\n";
 
+    });
+
+    content +=
+      "\nTotal Records: " +
+      visibleAttendance.length;
+
+
+    const blob =
+      new Blob([content], {
+        type: "text/plain;charset=utf-8"
       });
 
-    });
+    const url =
+      URL.createObjectURL(blob);
 
-    visibleAttendance = allAttendance.slice();
+    const a =
+      document.createElement("a");
 
-    displayAttendance(visibleAttendance);
+    a.href = url;
 
-  }
+    a.download =
+      "Teacher_Attendance_Report.txt";
 
-  catch(error) {
+    document.body.appendChild(a);
 
-    console.error(error);
+    a.click();
 
-    status.innerText =
-      "❌ Error: " + error.message;
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+
+  } catch (error) {
+
+    alert("Download error: " + error.message);
 
   }
 
 }
-
-
-function displayAttendance(records) {
-
-  const status =
-    document.getElementById("status");
-
-  const list =
-    document.getElementById("attendanceList");
-
-  visibleAttendance = records.slice();
-
-
-  if (records.length === 0) {
-
-    status.innerText =
-      "No attendance record found.";
-
-    list.innerHTML = "";
-
-    return;
-
-  }
-
-
-  status.innerText =
-    "Total Records: " + records.length;
-
-
-  let html = "";
-
-
-  records.slice().reverse().forEach(function(record) {
-
-    html +=
-      '<div class="record">' +
-
-      "<b>Teacher:</b> " +
-      escapeHTML(record.name) +
-      "<br>" +
-
-      "<b>Status:</b> " +
-      escapeHTML(record.status) +
-      "<br>" +
-
-      "<b>Date:</b> " +
-      escapeHTML(record.date) +
-      "<br>" +
-
-      "<b>Time:</b> " +
-      escapeHTML(record.time) +
-
-      "</div>";
-
-  });
-
-
-  list.innerHTML = html;
-
-}
-
-
-function searchAttendance() {
-
-  const teacherInput =
-    document.getElementById("teacherSearch")
-    .value.trim().toLowerCase();
-
-
-  const dateInput =
-    document.getElementById("dateSearch")
-    .value.trim().toLowerCase();
-
-
-  const filtered =
-    allAttendance.filter(function(record) {
-
-      const recordName =
-        String(record.name)
-        .trim()
-        .toLowerCase();
-
-
-      const recordDate =
-        String(record.date)
-        .trim()
-        .toLowerCase();
-
-
-      const nameOK =
-        teacherInput === "" ||
-        recordName.includes(teacherInput);
-
-
-      const dateOK =
-        dateInput === "" ||
-        recordDate.includes(dateInput);
-
-
-      return nameOK && dateOK;
-
-    });
-
-
-  displayAttendance(filtered);
-
-}
-
-
-function showAll() {
-
-  document.getElementById("teacherSearch").value = "";
-
-  document.getElementById("dateSearch").value = "";
-
-  displayAttendance(allAttendance);
-
-}
-
-
-/* =========================
-   PDF DOWNLOAD
-========================= */
-
-function downloadPDF() {
-
-  if (!visibleAttendance ||
-      visibleAttendance.length === 0) {
-
-    alert(
-      "PDF ke liye koi attendance record nahi mila."
-    );
-
-    return;
-  }
-
-
-  if (!window.jspdf) {
-
-    alert(
-      "PDF library load nahi hui. Internet check karein."
-    );
-
-    return;
-  }
-
-
-  const { jsPDF } = window.jspdf;
-
-  const doc = new jsPDF();
-
-
-  const teacher =
-    document.getElementById("teacherSearch")
-    .value.trim();
-
-
-  const date =
-    document.getElementById("dateSearch")
-    .value.trim();
-
-
-  /* School Name */
-
-  doc.setFontSize(16);
-
-  doc.setFont(undefined, "bold");
-
-  doc.text(
-    "Moon Star Public High School Khanwahan",
-    105,
-    15,
-    { align: "center" }
-  );
-
-
-  /* Report Title */
-
-  doc.setFontSize(13);
-
-  doc.text(
-    "Teacher Attendance Report",
-    105,
-    25,
-    { align: "center" }
-  );
-
-
-  doc.setFont(undefined, "normal");
-
-
-  let y = 38;
-
-
-  if (teacher) {
-
-    doc.text(
-      "Teacher: " + teacher,
-      10,
-      y
-    );
-
-    y += 7;
-
-  }
-
-
-  if (date) {
-
-    doc.text(
-      "Date: " + date,
-      10,
-      y
-    );
-
-    y += 7;
-
-  }
-
-
-  doc.text(
-    "Total Records: " +
-    visibleAttendance.length,
-    10,
-    y
-  );
-
-
-  y += 10;
-
-
-  /* Table */
-
-  const startX = 10;
-
-  const rowHeight = 9;
-
-
-  const col1 = 65;
-  const col2 = 105;
-  const col3 = 145;
-  const col4 = 200;
-
-
-  function drawHeader() {
-
-    doc.setFont(undefined, "bold");
-
-    doc.rect(
-      startX,
-      y,
-      col1 - startX,
-      rowHeight
-    );
-
-    doc.rect(
-      col1,
-      y,
-      col2 - col1,
-      rowHeight
-    );
-
-    doc.rect(
-      col2,
-      y,
-      col3 - col2,
-      rowHeight
-    );
-
-    doc.rect(
-      col3,
-      y,
-      col4 - col3,
-      rowHeight
-    );
-
-
-    doc.text("Teacher", 12, y + 6);
-
-    doc.text("Status", 67, y + 6);
-
-    doc.text("Date", 107, y + 6);
-
-    doc.text("Time", 147, y + 6);
-
-
-    doc.setFont(undefined, "normal");
-
-    y += rowHeight;
-
-  }
-
-
-  drawHeader();
-
-
-  const rows =
-    visibleAttendance
-    .slice()
-    .reverse();
-
-
-  rows.forEach(function(record, index) {
-
-
-    if (y > 270) {
-
-      doc.addPage();
-
-      y = 20;
-
-      drawHeader();
-
-    }
-
-
-    doc.rect(
-      startX,
-      y,
-      col1 - startX,
-      rowHeight
-    );
-
-    doc.rect(
-      col1,
-      y,
-      col2 - col1,
-      rowHeight
-    );
-
-    doc.rect(
-      col2,
-      y,
-      col3 - col2,
-      rowHeight
-    );
-
-    doc.rect(
-      col3,
-      y,
-      col4 - col3,
-      rowHeight
-    );
-
-
-    let teacherName =
-      String(record.name || "");
-
-
-    if (teacherName.length > 24) {
-
-      teacherName =
-        teacherName.substring(0, 23) + ".";
-
-    }
-
-
-    doc.text(
-      teacherName,
-      12,
-      y + 6
-    );
-
-
-    doc.text(
-      String(record.status || ""),
-      67,
-      y + 6
-    );
-
-
-    doc.text(
-      String(record.date || ""),
-      107,
-      y + 6
-    );
-
-
-    doc.text(
-      String(record.time || ""),
-      147,
-      y + 6
-    );
-
-
-    y += rowHeight;
-
-  });
-
-
-  /* File Name */
-
-  let fileName =
-    "Teacher_Attendance_Report";
-
-
-  if (teacher) {
-
-    fileName +=
-      "_" +
-      teacher.replace(/[^a-zA-Z0-9]/g, "_");
-
-  }
-
-
-  if (date) {
-
-    fileName +=
-      "_" +
-      date.replace(/[^0-9]/g, "_");
-
-  }
-
-
-  fileName += ".pdf";
-
-
-  /* Direct Download */
-
-  doc.save(fileName);
-
-}
-
-
-/* =========================
-   SECURITY HTML
-========================= */
-
-function escapeHTML(value) {
-
-  return String(value)
-
-    .replace(/&/g, "&amp;")
-
-    .replace(/</g, "&lt;")
-
-    .replace(/>/g, "&gt;")
-
-    .replace(/"/g, "&quot;")
-
-    .replace(/'/g, "&#039;");
-
-}
-
-
-/* Buttons */
-
-document
-  .getElementById("searchBtn")
-  .addEventListener(
-    "click",
-    searchAttendance
-  );
-
-
-document
-  .getElementById("showAllBtn")
-  .addEventListener(
-    "click",
-    showAll
-  );
-
-
-document
-  .getElementById("refreshBtn")
-  .addEventListener(
-    "click",
-    loadAttendance
-  );
-
-
-document
-  .getElementById("pdfBtn")
-  .addEventListener(
-    "click",
-    downloadPDF
-  );
-
-
-loadAttendance();
-
-</script>
-
-</body>
-</html>
