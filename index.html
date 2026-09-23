@@ -492,43 +492,164 @@ function showHistory() {
 
         "</div>";
 
-    });
+async function checkFace() {
 
-  box.innerHTML = html;
+  if (!registeredDescriptor) {
+    alert("Pehle face Register karein.");
+    return;
+  }
 
-}
+  if (!stream) {
+    alert("Pehle Start Camera dabayein.");
+    return;
+  }
 
+  const video = document.getElementById("camera");
+  const status = document.getElementById("status");
 
-function clearHistory() {
+  try {
 
-  if (
-    confirm(
-      "Kya aap Attendance History delete karna chahte hain?"
-    )
-  ) {
+    status.innerText = "Face detection start...";
 
-    localStorage.removeItem(
-      "attendanceHistory"
-    );
+    const detection = await Promise.race([
 
-    document.getElementById("history").innerHTML =
-      "";
+      faceapi
+        .detectSingleFace(
+          video,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.4
+          })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor(),
 
-    document.getElementById("status").innerText =
-      "Attendance History clear ho gayi.";
+      new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Face detection timeout")),
+          10000
+        )
+      )
+
+    ]);
+
+    if (!detection) {
+      status.innerText =
+        "❌ Face detect nahi hua. Roshni barha kar dobara try karein.";
+      return;
+    }
+
+    const distance =
+      faceapi.euclideanDistance(
+        registeredDescriptor,
+        detection.descriptor
+      );
+
+    if (distance < 0.55) {
+
+      const now = new Date();
+
+      const date =
+        now.toLocaleDateString();
+
+      const time =
+        now.toLocaleTimeString();
+
+      const snapshot = await getDocs(
+        collection(db, "attendance")
+      );
+
+      let alreadyMarked = false;
+
+      snapshot.forEach((doc) => {
+
+        const data = doc.data();
+
+        if (
+          data.name === registeredName &&
+          data.date === date &&
+          data.status === "Present"
+        ) {
+          alreadyMarked = true;
+        }
+
+      });
+
+      if (alreadyMarked) {
+
+        status.innerText =
+          "⚠️ " +
+          registeredName +
+          " ki aaj ki attendance pehle hi lag chuki hai.";
+
+        return;
+      }
+
+      const attendance = {
+
+        name: registeredName,
+
+        status: "Present",
+
+        date: date,
+
+        time: time
+
+      };
+
+      let history =
+        JSON.parse(
+          localStorage.getItem("attendanceHistory")
+        ) || [];
+
+      history.push(attendance);
+
+      localStorage.setItem(
+        "attendanceHistory",
+        JSON.stringify(history)
+      );
+
+      try {
+
+        await addDoc(
+          collection(db, "attendance"),
+          attendance
+        );
+
+        status.innerText =
+          "✅ " +
+          registeredName +
+          " Present\n" +
+          date +
+          " " +
+          time +
+          "\n☁️ Firebase mein save ho gaya";
+
+      } catch (error) {
+
+        console.error(error);
+
+        status.innerText =
+          "Attendance local mein save hui,\n" +
+          "lekin Firebase mein save nahi hui.\n" +
+          error.message;
+
+      }
+
+    } else {
+
+      status.innerText =
+        "❌ Face match nahi hua.";
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    status.innerText =
+      "⚠️ " + error.message;
 
   }
 
 }
-
-
-loadModels();
-window.startCamera = startCamera;
-window.registerFace = registerFace;
-window.checkFace = checkFace;
-window.showHistory = showHistory;
-window.clearHistory = clearHistory;
-</script>
-
-</body>
-</html>
