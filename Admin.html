@@ -1,78 +1,499 @@
-function downloadPDF() {
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher Attendance Admin</title>
 
-  if (!visibleAttendance || visibleAttendance.length === 0) {
-    alert("PDF ke liye koi attendance record nahi mila.");
-    return;
-  }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 15px;
+      background: #f5f5f5;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .controls {
+      text-align: center;
+    }
+
+    input, button {
+      padding: 12px;
+      margin: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input {
+      width: 90%;
+      max-width: 320px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    #status {
+      font-weight: bold;
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    #attendanceList {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .record {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 12px;
+      margin: 8px 0;
+    }
+
+    /* PRINT SETTINGS */
+    @media print {
+
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .controls {
+        display: none;
+      }
+
+      h1 {
+        font-size: 22px;
+        margin-bottom: 5px;
+      }
+
+      #status {
+        margin: 10px 0;
+      }
+
+      #attendanceList {
+        max-width: 100%;
+      }
+
+      .record {
+        border: 1px solid #000;
+        border-radius: 0;
+        margin: 0;
+        padding: 8px;
+        page-break-inside: avoid;
+      }
+
+      @page {
+        size: A4;
+        margin: 15mm;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>Moon Star Public High School Khanwahan</h1>
+
+<div class="controls">
+
+  <input
+    id="teacherSearch"
+    type="text"
+    placeholder="Teacher Name"
+  >
+
+  <br>
+
+  <input
+    id="dateSearch"
+    type="text"
+    placeholder="Date e.g. 23/09/2026"
+  >
+
+  <br>
+
+  <button id="searchBtn">🔎 Search</button>
+
+  <button id="showAllBtn">🔄 Show All</button>
+
+  <button id="refreshBtn">☁️ Refresh</button>
+
+  <br>
+
+  <button id="printBtn">🖨️ Print / Save as PDF</button>
+
+</div>
+
+<div id="status">
+  Attendance loading...
+</div>
+
+<div id="attendanceList"></div>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  getDocs
+}
+from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
+
+  authDomain:
+    "teachers-face-attendance.firebaseapp.com",
+
+  projectId:
+    "teachers-face-attendance",
+
+  storageBucket:
+    "teachers-face-attendance.firebasestorage.app",
+
+  messagingSenderId:
+    "63876838606",
+
+  appId:
+    "1:63876838606:web:572e240079865aabbc4c9f",
+
+  measurementId:
+    "G-XN93NKWLY5"
+
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+/* DATA */
+
+let allAttendance = [];
+
+let visibleAttendance = [];
+
+
+/* LOAD ATTENDANCE */
+
+async function loadAttendance() {
+
+  const status =
+    document.getElementById("status");
+
+  status.innerText =
+    "Attendance loading...";
 
   try {
 
-    const teacher =
-      document.getElementById("teacherSearch").value.trim();
+    const snapshot =
+      await getDocs(
+        collection(db, "attendance")
+      );
 
-    const date =
-      document.getElementById("dateSearch").value.trim();
+    allAttendance = [];
 
-    let content = "";
+    snapshot.forEach(function(doc) {
 
-    content += "MOON STAR PUBLIC HIGH SCHOOL KHANWAWAN\n";
-    content += "TEACHER ATTENDANCE REPORT\n\n";
+      const data = doc.data();
 
-    if (teacher) {
-      content += "Teacher: " + teacher + "\n";
-    }
+      allAttendance.push({
 
-    if (date) {
-      content += "Date: " + date + "\n";
-    }
+        name: data.name || "",
 
-    content += "\n";
-    content += "Teacher | Status | Date | Time\n";
-    content += "------------------------------------------\n";
+        status: data.status || "",
 
-    visibleAttendance.slice().reverse().forEach(function(record) {
+        date: data.date || "",
 
-      content +=
-        record.name + " | " +
-        record.status + " | " +
-        record.date + " | " +
-        record.time + "\n";
+        time: data.time || ""
+
+      });
 
     });
 
-    content +=
-      "\nTotal Records: " +
-      visibleAttendance.length;
+    visibleAttendance =
+      allAttendance.slice();
 
+    displayAttendance(
+      visibleAttendance
+    );
 
-    const blob =
-      new Blob([content], {
-        type: "text/plain;charset=utf-8"
-      });
+  }
 
-    const url =
-      URL.createObjectURL(blob);
+  catch(error) {
 
-    const a =
-      document.createElement("a");
+    console.error(error);
 
-    a.href = url;
-
-    a.download =
-      "Teacher_Attendance_Report.txt";
-
-    document.body.appendChild(a);
-
-    a.click();
-
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-
-  } catch (error) {
-
-    alert("Download error: " + error.message);
+    status.innerText =
+      "❌ Error: " + error.message;
 
   }
 
 }
+
+
+/* DISPLAY */
+
+function displayAttendance(records) {
+
+  const status =
+    document.getElementById("status");
+
+  const list =
+    document.getElementById(
+      "attendanceList"
+    );
+
+  visibleAttendance =
+    records.slice();
+
+
+  if (records.length === 0) {
+
+    status.innerText =
+      "No attendance record found.";
+
+    list.innerHTML = "";
+
+    return;
+
+  }
+
+
+  status.innerText =
+    "Total Records: " +
+    records.length;
+
+
+  let html = "";
+
+
+  records
+    .slice()
+    .reverse()
+    .forEach(function(record) {
+
+      html +=
+
+        '<div class="record">' +
+
+        "<b>Teacher:</b> " +
+        escapeHTML(record.name) +
+        "<br>" +
+
+        "<b>Status:</b> " +
+        escapeHTML(record.status) +
+        "<br>" +
+
+        "<b>Date:</b> " +
+        escapeHTML(record.date) +
+        "<br>" +
+
+        "<b>Time:</b> " +
+        escapeHTML(record.time) +
+
+        "</div>";
+
+    });
+
+
+  list.innerHTML = html;
+
+}
+
+
+/* SEARCH */
+
+function searchAttendance() {
+
+  const teacherInput =
+    document
+      .getElementById("teacherSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const dateInput =
+    document
+      .getElementById("dateSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const filtered =
+    allAttendance.filter(
+      function(record) {
+
+        const recordName =
+          String(record.name)
+            .trim()
+            .toLowerCase();
+
+
+        const recordDate =
+          String(record.date)
+            .trim()
+            .toLowerCase();
+
+
+        const nameOK =
+          teacherInput === "" ||
+          recordName.includes(
+            teacherInput
+          );
+
+
+        const dateOK =
+          dateInput === "" ||
+          recordDate.includes(
+            dateInput
+          );
+
+
+        return nameOK && dateOK;
+
+      }
+    );
+
+
+  displayAttendance(filtered);
+
+}
+
+
+/* SHOW ALL */
+
+function showAll() {
+
+  document.getElementById(
+    "teacherSearch"
+  ).value = "";
+
+
+  document.getElementById(
+    "dateSearch"
+  ).value = "";
+
+
+  displayAttendance(
+    allAttendance
+  );
+
+}
+
+
+/* PRINT / SAVE PDF */
+
+function printReport() {
+
+  if (
+    !visibleAttendance ||
+    visibleAttendance.length === 0
+  ) {
+
+    alert(
+      "Print ke liye koi attendance record nahi mila."
+    );
+
+    return;
+
+  }
+
+
+  window.print();
+
+}
+
+
+/* HTML SECURITY */
+
+function escapeHTML(value) {
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* BUTTONS */
+
+document
+  .getElementById("searchBtn")
+  .addEventListener(
+    "click",
+    searchAttendance
+  );
+
+
+document
+  .getElementById("showAllBtn")
+  .addEventListener(
+    "click",
+    showAll
+  );
+
+
+document
+  .getElementById("refreshBtn")
+  .addEventListener(
+    "click",
+    loadAttendance
+  );
+
+
+document
+  .getElementById("printBtn")
+  .addEventListener(
+    "click",
+    printReport
+  );
+
+
+/* START */
+
+loadAttendance();
+
+</script>
+
+</body>
+</html>
