@@ -300,12 +300,14 @@ async function checkFace() {
   document.getElementById("status").innerText =
     "Face match ho raha hai...";
 
+  try {
+
   const detection =
     await faceapi
       .detectSingleFace(
         video,
         new faceapi.TinyFaceDetectorOptions({
-          inputSize: 416,
+          inputSize: 320,
           scoreThreshold: 0.5
         })
       )
@@ -319,6 +321,18 @@ async function checkFace() {
 
     return;
   }
+
+  // detection ke baad wala existing code yahan rahega
+
+} catch (error) {
+
+  console.error(error);
+
+  document.getElementById("status").innerText =
+    "Face detection error: " + error.message;
+
+  return;
+}
 
   const distance =
     faceapi.euclideanDistance(
