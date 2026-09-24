@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Teachers Face Attendance</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-
-  <style>
+  <title>Teachers Face Attendance</title>  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>  <style>
     body {
       font-family: Arial;
       text-align: center;
@@ -62,81 +57,42 @@
       margin: 8px 0;
       border-radius: 8px;
     }
-  </style>
-</head>
-
-<body>
-
-<h1>Teachers Face Attendance</h1>
-
-<input id="name" type="text" placeholder="Teacher Name">
-
-<br>
-
-<button onclick="startCamera()">📷 Start Camera</button>
+  </style></head><body><h1>Teachers Face Attendance</h1><input id="name" type="text" placeholder="Teacher Name"><br><button onclick="startCamera()">📷 Start Camera</button>
 <button onclick="registerFace()">➕ Register Teacher Face</button>
 
-<br>
+<br><button onclick="checkFace()">✅ Mark Attendance</button>
 
-<button onclick="checkFace()">✅ Mark Attendance</button>
-
-<br>
-
-<button onclick="showHistory()">📋 Attendance History</button>
+<br><button onclick="showHistory()">📋 Attendance History</button>
 <button onclick="clearHistory()">🗑️ Clear Local History</button>
 
-<br>
+<br><video id="camera" autoplay muted playsinline></video>
 
-<video id="camera" autoplay muted playsinline></video>
-
-<h3 id="status">Loading face recognition...</h3>
-
-<div id="history"></div>
-
-
-<script type="module">
+<h3 id="status">Loading face recognition...</h3><div id="history"></div><script type="module">
 
 import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 import {
   getFirestore,
   collection,
   addDoc,
   getDocs
-}
-from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
 /* Firebase */
 
 const firebaseConfig = {
-
   apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
-
-  authDomain:
-    "teachers-face-attendance.firebaseapp.com",
-
-  projectId:
-    "teachers-face-attendance",
-
-  storageBucket:
-    "teachers-face-attendance.firebasestorage.app",
-
-  messagingSenderId:
-    "63876838606",
-
-  appId:
-    "1:63876838606:web:572e240079865aabbc4c9f",
-
-  measurementId:
-    "G-XN93NKWLY5"
-
+  authDomain: "teachers-face-attendance.firebaseapp.com",
+  projectId: "teachers-face-attendance",
+  storageBucket: "teachers-face-attendance.firebasestorage.app",
+  messagingSenderId: "63876838606",
+  appId: "1:63876838606:web:572e240079865aabbc4c9f",
+  measurementId: "G-XN93NKWLY5"
 };
 
-
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
 
@@ -145,7 +101,7 @@ const db = getFirestore(app);
 let stream = null;
 
 const MODEL_URL =
-"https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+  "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
 
 /* Load Models */
@@ -157,17 +113,11 @@ async function loadModels() {
     document.getElementById("status").innerText =
       "Face recognition loading...";
 
-    await faceapi.nets.tinyFaceDetector.loadFromUri(
-      MODEL_URL
-    );
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
 
-    await faceapi.nets.faceLandmark68Net.loadFromUri(
-      MODEL_URL
-    );
+    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
 
-    await faceapi.nets.faceRecognitionNet.loadFromUri(
-      MODEL_URL
-    );
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
     document.getElementById("status").innerText =
       "✅ Models loaded. Camera start karein.";
@@ -190,27 +140,23 @@ async function startCamera() {
 
   try {
 
-    stream =
-      await navigator.mediaDevices.getUserMedia({
+    stream = await navigator.mediaDevices.getUserMedia({
 
-        video: {
-          facingMode: "user",
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
+      video: {
+        facingMode: "user",
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
 
-        audio: false
+      audio: false
 
-      });
+    });
 
-
-    const video =
-      document.getElementById("camera");
+    const video = document.getElementById("camera");
 
     video.srcObject = stream;
 
     await video.play();
-
 
     document.getElementById("status").innerText =
       "📷 Camera started successfully ✅";
@@ -227,7 +173,7 @@ async function startCamera() {
 }
 
 
-/* Register Teacher */
+/* Register Teacher Face */
 
 async function registerFace() {
 
@@ -237,7 +183,6 @@ async function registerFace() {
   const video =
     document.getElementById("camera");
 
-
   if (!name) {
 
     alert("Pehle teacher ka naam likhein.");
@@ -245,7 +190,6 @@ async function registerFace() {
     return;
 
   }
-
 
   if (!stream) {
 
@@ -255,25 +199,22 @@ async function registerFace() {
 
   }
 
-
   document.getElementById("status").innerText =
     "🔍 Face scan ho raha hai...";
-
 
   try {
 
     const detection =
       await faceapi
-      .detectSingleFace(
-        video,
-        new faceapi.TinyFaceDetectorOptions({
-          inputSize: 320,
-          scoreThreshold: 0.4
-        })
-      )
-      .withFaceLandmarks()
-      .withFaceDescriptor();
-
+        .detectSingleFace(
+          video,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.4
+          })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
     if (!detection) {
 
@@ -284,24 +225,15 @@ async function registerFace() {
 
     }
 
-
     const descriptor =
       Array.from(detection.descriptor);
-
-
-    /*
-      Check whether same teacher name
-      already exists
-    */
 
     const snapshot =
       await getDocs(
         collection(db, "teachers")
       );
 
-
     let sameName = false;
-
 
     snapshot.forEach((doc) => {
 
@@ -309,8 +241,7 @@ async function registerFace() {
 
       if (
         data.name &&
-        data.name.toLowerCase() ===
-        name.toLowerCase()
+        data.name.toLowerCase() === name.toLowerCase()
       ) {
 
         sameName = true;
@@ -318,7 +249,6 @@ async function registerFace() {
       }
 
     });
-
 
     if (sameName) {
 
@@ -328,7 +258,6 @@ async function registerFace() {
           " pehle se registered hai.\n\n" +
           "Kya face dobara register karna hai?"
         );
-
 
       if (!confirmUpdate) {
 
@@ -341,28 +270,18 @@ async function registerFace() {
 
     }
 
-
-    /*
-      Save teacher face in Firebase
-    */
-
     await addDoc(
       collection(db, "teachers"),
       {
-
         name: name,
-
         descriptor: descriptor
-
       }
     );
-
 
     document.getElementById("status").innerText =
       "✅ " +
       name +
       " ka face Firebase mein register ho gaya.";
-
 
   } catch (error) {
 
@@ -389,32 +308,28 @@ async function checkFace() {
 
   }
 
-
   const video =
     document.getElementById("camera");
 
   const status =
     document.getElementById("status");
 
-
   status.innerText =
     "🔍 Face detect ho raha hai...";
-
 
   try {
 
     const detection =
       await faceapi
-      .detectSingleFace(
-        video,
-        new faceapi.TinyFaceDetectorOptions({
-          inputSize: 320,
-          scoreThreshold: 0.4
-        })
-      )
-      .withFaceLandmarks()
-      .withFaceDescriptor();
-
+        .detectSingleFace(
+          video,
+          new faceapi.TinyFaceDetectorOptions({
+            inputSize: 320,
+            scoreThreshold: 0.4
+          })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor();
 
     if (!detection) {
 
@@ -425,20 +340,13 @@ async function checkFace() {
 
     }
 
-
     status.innerText =
       "🔄 Teacher match ho raha hai...";
-
-
-    /*
-      Get all registered teachers
-    */
 
     const snapshot =
       await getDocs(
         collection(db, "teachers")
       );
-
 
     if (snapshot.empty) {
 
@@ -449,20 +357,12 @@ async function checkFace() {
 
     }
 
-
     let matchedTeacher = null;
-
     let smallestDistance = 999;
-
-
-    /*
-      Compare face with all teachers
-    */
 
     snapshot.forEach((doc) => {
 
       const data = doc.data();
-
 
       if (
         data.descriptor &&
@@ -470,10 +370,7 @@ async function checkFace() {
       ) {
 
         const savedDescriptor =
-          new Float32Array(
-            data.descriptor
-          );
-
+          new Float32Array(data.descriptor);
 
         const distance =
           faceapi.euclideanDistance(
@@ -481,14 +378,9 @@ async function checkFace() {
             detection.descriptor
           );
 
+        if (distance < smallestDistance) {
 
-        if (
-          distance < smallestDistance
-        ) {
-
-          smallestDistance =
-            distance;
-
+          smallestDistance = distance;
           matchedTeacher = data.name;
 
         }
@@ -496,11 +388,6 @@ async function checkFace() {
       }
 
     });
-
-
-    /*
-      Face threshold
-    */
 
     if (
       !matchedTeacher ||
@@ -514,36 +401,24 @@ async function checkFace() {
 
     }
 
-
-    const now =
-      new Date();
-
+    const now = new Date();
 
     const date =
       now.toLocaleDateString();
 
-
     const time =
       now.toLocaleTimeString();
-
-
-    /*
-      Check today's attendance
-    */
 
     const attendanceSnapshot =
       await getDocs(
         collection(db, "attendance")
       );
 
-
     let alreadyMarked = false;
-
 
     attendanceSnapshot.forEach((doc) => {
 
       const data = doc.data();
-
 
       if (
         data.name === matchedTeacher &&
@@ -557,7 +432,6 @@ async function checkFace() {
 
     });
 
-
     if (alreadyMarked) {
 
       status.innerText =
@@ -568,11 +442,6 @@ async function checkFace() {
       return;
 
     }
-
-
-    /*
-      Attendance record
-    */
 
     const attendance = {
 
@@ -586,37 +455,26 @@ async function checkFace() {
 
     };
 
-
-    /*
-      Firebase attendance
-    */
+    /* Firebase mein attendance save */
 
     await addDoc(
       collection(db, "attendance"),
       attendance
     );
 
-
-    /*
-      Local history
-    */
+    /* Local history */
 
     let history =
       JSON.parse(
-        localStorage.getItem(
-          "attendanceHistory"
-        )
+        localStorage.getItem("attendanceHistory")
       ) || [];
 
-
     history.push(attendance);
-
 
     localStorage.setItem(
       "attendanceHistory",
       JSON.stringify(history)
     );
-
 
     status.innerText =
       "✅ " +
@@ -626,7 +484,6 @@ async function checkFace() {
       " " +
       time +
       "\n☁️ Firebase mein save ho gaya";
-
 
   } catch (error) {
 
@@ -647,15 +504,11 @@ function showHistory() {
 
   const history =
     JSON.parse(
-      localStorage.getItem(
-        "attendanceHistory"
-      )
+      localStorage.getItem("attendanceHistory")
     ) || [];
-
 
   const box =
     document.getElementById("history");
-
 
   if (history.length === 0) {
 
@@ -667,41 +520,38 @@ function showHistory() {
 
   }
 
-
   let html =
     "<h3>Attendance History</h3>";
 
-
   history
-  .slice()
-  .reverse()
-  .forEach(function(record) {
+    .slice()
+    .reverse()
+    .forEach(function(record) {
 
-    html +=
-      '<div class="record">' +
+      html +=
+        '<div class="record">' +
 
-      "<b>Name:</b> " +
-      record.name +
+        "<b>Name:</b> " +
+        record.name +
 
-      "<br>" +
+        "<br>" +
 
-      "<b>Status:</b> " +
-      record.status +
+        "<b>Status:</b> " +
+        record.status +
 
-      "<br>" +
+        "<br>" +
 
-      "<b>Date:</b> " +
-      record.date +
+        "<b>Date:</b> " +
+        record.date +
 
-      "<br>" +
+        "<br>" +
 
-      "<b>Time:</b> " +
-      record.time +
+        "<b>Time:</b> " +
+        record.time +
 
-      "</div>";
+        "</div>";
 
-  });
-
+    });
 
   box.innerHTML = html;
 
@@ -722,11 +572,9 @@ function clearHistory() {
       "attendanceHistory"
     );
 
-
     document.getElementById(
       "history"
     ).innerHTML = "";
-
 
     document.getElementById(
       "status"
@@ -740,27 +588,16 @@ function clearHistory() {
 
 /* Buttons */
 
-window.startCamera =
-  startCamera;
-
-window.registerFace =
-  registerFace;
-
-window.checkFace =
-  checkFace;
-
-window.showHistory =
-  showHistory;
-
-window.clearHistory =
-  clearHistory;
+window.startCamera = startCamera;
+window.registerFace = registerFace;
+window.checkFace = checkFace;
+window.showHistory = showHistory;
+window.clearHistory = clearHistory;
 
 
 /* Start */
 
 loadModels();
 
-</script>
-
-</body>
+</script></body>
 </html>
