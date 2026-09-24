@@ -231,9 +231,9 @@ video{
         👤 Register My Face
     </button>
 
-    <button onclick="checkFace()">
-        ✅ Mark Attendance
-    </button>
+    <button onclick="showMonthlyReport()">
+    📊 Monthly Report
+</button>
 
     <button onclick="showHistory()">
         📋 Show My History
@@ -248,7 +248,76 @@ video{
     </button>
 
     <video id="camera" autoplay muted playsinline></video>
+<div id="monthlyReportBox" class="hidden">
 
+    <h2>📊 Teacher Monthly Report</h2>
+
+    <input type="text" id="reportTeacherName" placeholder="Teacher Name" readonly>
+
+    <input type="month" id="reportMonth">
+
+    <input type="text" id="reportClass" placeholder="Class">
+
+    <h3>English</h3>
+    <input id="engTotal" type="number" placeholder="Total">
+    <input id="engRead" type="number" placeholder="Read">
+    <input id="engWrite" type="number" placeholder="Write">
+    <input id="engChecked" type="number" placeholder="Checked">
+    <input id="engUnchecked" type="number" placeholder="Unchecked">
+
+    <h3>Urdu</h3>
+    <input id="urduTotal" type="number" placeholder="Total">
+    <input id="urduRead" type="number" placeholder="Read">
+    <input id="urduWrite" type="number" placeholder="Write">
+    <input id="urduChecked" type="number" placeholder="Checked">
+    <input id="urduUnchecked" type="number" placeholder="Unchecked">
+
+    <h3>Math</h3>
+    <input id="mathTotal" type="number" placeholder="Total">
+    <input id="mathRead" type="number" placeholder="Read">
+    <input id="mathWrite" type="number" placeholder="Write">
+    <input id="mathChecked" type="number" placeholder="Checked">
+    <input id="mathUnchecked" type="number" placeholder="Unchecked">
+
+    <h3>Sindhi</h3>
+    <input id="sindhiTotal" type="number" placeholder="Total">
+    <input id="sindhiRead" type="number" placeholder="Read">
+    <input id="sindhiWrite" type="number" placeholder="Write">
+    <input id="sindhiChecked" type="number" placeholder="Checked">
+    <input id="sindhiUnchecked" type="number" placeholder="Unchecked">
+
+    <h3>S.S.</h3>
+    <input id="ssTotal" type="number" placeholder="Total">
+    <input id="ssRead" type="number" placeholder="Read">
+    <input id="ssWrite" type="number" placeholder="Write">
+    <input id="ssChecked" type="number" placeholder="Checked">
+    <input id="ssUnchecked" type="number" placeholder="Unchecked">
+
+    <h3>Islamiat</h3>
+    <input id="islTotal" type="number" placeholder="Total">
+    <input id="islRead" type="number" placeholder="Read">
+    <input id="islWrite" type="number" placeholder="Write">
+    <input id="islChecked" type="number" placeholder="Checked">
+    <input id="islUnchecked" type="number" placeholder="Unchecked">
+
+    <h3>G. Science</h3>
+    <input id="scienceTotal" type="number" placeholder="Total">
+    <input id="scienceRead" type="number" placeholder="Read">
+    <input id="scienceWrite" type="number" placeholder="Write">
+    <input id="scienceChecked" type="number" placeholder="Checked">
+    <input id="scienceUnchecked" type="number" placeholder="Unchecked">
+
+    <input type="text" id="teacherSignature" placeholder="Teacher Signature">
+
+    <button onclick="submitMonthlyReport()">
+        ☁️ Submit Monthly Report
+    </button>
+
+    <button onclick="closeMonthlyReport()">
+        ← Back
+    </button>
+
+</div>
 </div>
 
 
