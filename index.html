@@ -34,6 +34,7 @@ input{
     border:1px solid #ccc;
     border-radius:8px;
     font-size:16px;
+    box-sizing:border-box;
 }
 
 button{
@@ -46,12 +47,12 @@ button{
     cursor:pointer;
 }
 
-video{
-    width:100%;
-    max-width:420px;
-    margin-top:10px;
-    border-radius:12px;
-    background:#000;
+.auth-box{
+    padding:10px;
+}
+
+.hidden{
+    display:none;
 }
 
 #status{
@@ -63,6 +64,18 @@ video{
     text-align:left;
     margin-top:15px;
 }
+
+video{
+    width:100%;
+    max-width:420px;
+    margin-top:10px;
+    border-radius:12px;
+    background:#000;
+}
+
+.logout{
+    background:#ddd;
+}
 </style>
 </head>
 
@@ -72,33 +85,121 @@ video{
 
 <h1>👨‍🏫 Teachers Face Attendance</h1>
 
-<input type="text" id="name" placeholder="Teacher Name">
 
-<button onclick="startCamera()">📷 Start Camera</button>
+<!-- =========================
+     SIGNUP / LOGIN
+========================= -->
 
-<button onclick="setSchoolLocation()">
-📍 Set School Location
-</button>
+<div id="authSection">
 
-<button onclick="registerFace()">
-👤 Register Face
-</button>
+    <div id="signupBox" class="auth-box">
 
-<button onclick="checkFace()">
-✅ Mark Attendance
-</button>
+        <h2>📝 Teacher Signup</h2>
 
-<button onclick="showHistory()">
-📋 Show History
-</button>
+        <input
+            type="text"
+            id="signupName"
+            placeholder="Teacher Name"
+        >
 
-<button onclick="clearHistory()">
-🗑️ Clear History
-</button>
+        <input
+            type="email"
+            id="signupEmail"
+            placeholder="Email"
+        >
 
-<video id="camera" autoplay muted playsinline></video>
+        <input
+            type="password"
+            id="signupPassword"
+            placeholder="Password"
+        >
 
-<div id="status">Loading...</div>
+        <input
+            type="password"
+            id="signupConfirm"
+            placeholder="Confirm Password"
+        >
+
+        <button onclick="signup()">
+            📝 Create Account
+        </button>
+
+        <button onclick="showLogin()">
+            Already have account? Login
+        </button>
+
+    </div>
+
+
+    <div id="loginBox" class="auth-box hidden">
+
+        <h2>🔐 Teacher Login</h2>
+
+        <input
+            type="email"
+            id="loginEmail"
+            placeholder="Email"
+        >
+
+        <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+        >
+
+        <button onclick="login()">
+            🔐 Login
+        </button>
+
+        <button onclick="showSignup()">
+            Create New Account
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     TEACHER APP
+========================= -->
+
+<div id="appSection" class="hidden">
+
+    <h3 id="welcome"></h3>
+
+    <button onclick="startCamera()">
+        📷 Start Camera
+    </button>
+
+    <button onclick="registerFace()">
+        👤 Register My Face
+    </button>
+
+    <button onclick="checkFace()">
+        ✅ Mark Attendance
+    </button>
+
+    <button onclick="showHistory()">
+        📋 Show My History
+    </button>
+
+    <button onclick="clearHistory()">
+        🗑️ Clear Local History
+    </button>
+
+    <button class="logout" onclick="logout()">
+        🚪 Logout
+    </button>
+
+    <video id="camera" autoplay muted playsinline></video>
+
+</div>
+
+
+<div id="status">
+    Loading...
+</div>
 
 <div id="history"></div>
 
@@ -107,9 +208,33 @@ video{
 
 <script type="module">
 
+
+/* =========================
+   FIREBASE APP
+========================= */
+
 import {
     initializeApp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+
+/* =========================
+   FIREBASE AUTH
+========================= */
+
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+
+/* =========================
+   FIRESTORE
+========================= */
 
 import {
     getFirestore,
@@ -123,30 +248,507 @@ import {
 
 
 /* =========================
-   FIREBASE
+   FIREBASE CONFIG
 ========================= */
 
 const firebaseConfig = {
 
     apiKey: "AIzaSyBguAzVWGP_GPYCsgE2",
 
-    authDomain: "teachers-face-attendance.firebaseapp.com",
+    authDomain:
+    "teachers-face-attendance.firebaseapp.com",
 
-    projectId: "teachers-face-attendance",
+    projectId:
+    "teachers-face-attendance",
 
-    storageBucket: "teachers-face-attendance.firebasestorage.app",
+    storageBucket:
+    "teachers-face-attendance.firebasestorage.app",
 
-    messagingSenderId: "63876838606",
+    messagingSenderId:
+    "63876838606",
 
-    appId: "1:63876838606:web:572e240079865aabbc4c9f",
+    appId:
+    "1:63876838606:web:572e240079865aabbc4c9f",
 
-    measurementId: "G-XN93NKWLY5"
+    measurementId:
+    "G-XN93NKWLY5"
 
 };
 
-const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+/* =========================
+   INITIALIZE
+========================= */
+
+const app =
+initializeApp(firebaseConfig);
+
+const auth =
+getAuth(app);
+
+const db =
+getFirestore(app);
+
+
+/* =========================
+   CURRENT USER
+========================= */
+
+let currentUser = null;
+
+
+/* =========================
+   SHOW SIGNUP
+========================= */
+
+function showSignup(){
+
+    document
+    .getElementById("signupBox")
+    .classList.remove("hidden");
+
+    document
+    .getElementById("loginBox")
+    .classList.add("hidden");
+
+    document
+    .getElementById("status")
+    .innerText =
+    "Create your teacher account.";
+
+}
+
+
+/* =========================
+   SHOW LOGIN
+========================= */
+
+function showLogin(){
+
+    document
+    .getElementById("signupBox")
+    .classList.add("hidden");
+
+    document
+    .getElementById("loginBox")
+    .classList.remove("hidden");
+
+    document
+    .getElementById("status")
+    .innerText =
+    "Login to your account.";
+
+}
+
+
+/* =========================
+   SIGNUP
+========================= */
+
+async function signup(){
+
+    const name =
+    document
+    .getElementById("signupName")
+    .value
+    .trim();
+
+    const email =
+    document
+    .getElementById("signupEmail")
+    .value
+    .trim();
+
+    const password =
+    document
+    .getElementById("signupPassword")
+    .value;
+
+    const confirmPassword =
+    document
+    .getElementById("signupConfirm")
+    .value;
+
+
+    if(!name){
+
+        alert("Teacher name likhein.");
+
+        return;
+    }
+
+
+    if(!email){
+
+        alert("Email likhein.");
+
+        return;
+    }
+
+
+    if(password.length < 6){
+
+        alert(
+            "Password kam az kam 6 characters ka hona chahiye."
+        );
+
+        return;
+    }
+
+
+    if(password !== confirmPassword){
+
+        alert(
+            "Password aur Confirm Password same nahi hain."
+        );
+
+        return;
+    }
+
+
+    try{
+
+        document
+        .getElementById("status")
+        .innerText =
+        "⏳ Account ban raha hai...";
+
+
+        const userCredential =
+        await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+
+        const user =
+        userCredential.user;
+
+
+        await updateProfile(
+            user,
+            {
+                displayName:name
+            }
+        );
+
+
+        /* Save teacher profile */
+
+        await setDoc(
+            doc(db,"teacherAccounts",user.uid),
+            {
+
+                uid:user.uid,
+
+                name:name,
+
+                email:email,
+
+                createdAt:
+                new Date().toISOString()
+
+            }
+        );
+
+
+        alert(
+            "✅ Account successfully create ho gaya."
+        );
+
+
+        currentUser=user;
+
+        openTeacherApp();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        let message =
+        error.message;
+
+
+        if(error.code ===
+        "auth/email-already-in-use"){
+
+            message =
+            "Ye email pehle se registered hai.";
+
+        }
+
+
+        if(error.code ===
+        "auth/invalid-email"){
+
+            message =
+            "Email address sahi nahi hai.";
+
+        }
+
+
+        document
+        .getElementById("status")
+        .innerText =
+        "❌ Signup error";
+
+
+        alert(message);
+
+    }
+
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+async function login(){
+
+    const email =
+    document
+    .getElementById("loginEmail")
+    .value
+    .trim();
+
+    const password =
+    document
+    .getElementById("loginPassword")
+    .value;
+
+
+    if(!email){
+
+        alert("Email likhein.");
+
+        return;
+    }
+
+
+    if(!password){
+
+        alert("Password likhein.");
+
+        return;
+    }
+
+
+    try{
+
+        document
+        .getElementById("status")
+        .innerText =
+        "⏳ Login ho raha hai...";
+
+
+        const userCredential =
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+
+        currentUser =
+        userCredential.user;
+
+
+        openTeacherApp();
+
+
+    }catch(error){
+
+        console.error(error);
+
+        let message =
+        "Email ya password ghalat hai.";
+
+
+        if(
+            error.code ===
+            "auth/user-not-found"
+        ){
+
+            message =
+            "Ye account registered nahi hai.";
+
+        }
+
+
+        if(
+            error.code ===
+            "auth/wrong-password"
+        ){
+
+            message =
+            "Password ghalat hai.";
+
+        }
+
+
+        document
+        .getElementById("status")
+        .innerText =
+        "❌ Login failed";
+
+
+        alert(message);
+
+    }
+
+}
+
+
+/* =========================
+   OPEN TEACHER APP
+========================= */
+
+async function openTeacherApp(){
+
+    document
+    .getElementById("authSection")
+    .classList.add("hidden");
+
+
+    document
+    .getElementById("appSection")
+    .classList.remove("hidden");
+
+
+    let teacherName =
+    currentUser.displayName;
+
+
+    if(!teacherName){
+
+        try{
+
+            const accountDoc =
+            await getDoc(
+                doc(
+                    db,
+                    "teacherAccounts",
+                    currentUser.uid
+                )
+            );
+
+
+            if(accountDoc.exists()){
+
+                teacherName =
+                accountDoc.data().name;
+
+            }
+
+        }catch(error){
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    document
+    .getElementById("welcome")
+    .innerText =
+    "👋 Welcome " +
+    (teacherName || currentUser.email);
+
+
+    document
+    .getElementById("status")
+    .innerText =
+    "✅ Login successful";
+
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+async function logout(){
+
+    try{
+
+        await signOut(auth);
+
+        if(stream){
+
+            stream
+            .getTracks()
+            .forEach(
+                track=>track.stop()
+            );
+
+            stream=null;
+        }
+
+
+        document
+        .getElementById("appSection")
+        .classList.add("hidden");
+
+
+        document
+        .getElementById("authSection")
+        .classList.remove("hidden");
+
+
+        showLogin();
+
+
+        document
+        .getElementById("status")
+        .innerText =
+        "Logged out";
+
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* =========================
+   AUTH STATE
+========================= */
+
+onAuthStateChanged(
+    auth,
+    async(user)=>{
+
+        if(user){
+
+            currentUser=user;
+
+            openTeacherApp();
+
+        }else{
+
+            currentUser=null;
+
+            document
+            .getElementById("appSection")
+            .classList.add("hidden");
+
+            document
+            .getElementById("authSection")
+            .classList.remove("hidden");
+
+            showSignup();
+
+        }
+
+    }
+);
 
 
 /* =========================
@@ -159,7 +761,7 @@ const faceapiScript =
 const modelURL =
 "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
-let faceapiLoaded = false;
+let faceapiLoaded=false;
 
 
 /* =========================
@@ -168,50 +770,90 @@ let faceapiLoaded = false;
 
 function loadFaceApi(){
 
-    return new Promise((resolve,reject)=>{
+    return new Promise(
+    (resolve,reject)=>{
 
-        const script=document.createElement("script");
+        const script =
+        document.createElement("script");
 
-        script.src=faceapiScript;
+        script.src =
+        faceapiScript;
 
-        script.onload=async()=>{
+
+        script.onload =
+        async()=>{
 
             try{
 
-                await faceapi.nets.tinyFaceDetector.loadFromUri(modelURL);
+                await faceapi
+                .nets
+                .tinyFaceDetector
+                .loadFromUri(
+                    modelURL
+                );
 
-                await faceapi.nets.faceLandmark68Net.loadFromUri(modelURL);
 
-                await faceapi.nets.faceRecognitionNet.loadFromUri(modelURL);
+                await faceapi
+                .nets
+                .faceLandmark68Net
+                .loadFromUri(
+                    modelURL
+                );
+
+
+                await faceapi
+                .nets
+                .faceRecognitionNet
+                .loadFromUri(
+                    modelURL
+                );
+
 
                 faceapiLoaded=true;
 
-                document.getElementById("status").innerText =
+
+                document
+                .getElementById("status")
+                .innerText =
                 "✅ System ready";
 
+
                 resolve();
+
 
             }catch(error){
 
                 console.error(error);
 
-                document.getElementById("status").innerText =
+                document
+                .getElementById("status")
+                .innerText =
                 "❌ Face model load nahi hua";
 
+
                 reject(error);
+
             }
 
         };
 
+
         script.onerror=()=>{
 
-            document.getElementById("status").innerText =
+            document
+            .getElementById("status")
+            .innerText =
             "❌ Face API load nahi hui";
 
+
             reject();
+
         };
 
-        document.head.appendChild(script);
+
+        document
+        .head
+        .appendChild(script);
 
     });
 
@@ -224,17 +866,26 @@ function loadFaceApi(){
 
 let stream=null;
 
+
 async function startCamera(){
 
     try{
 
         if(stream){
 
-            stream.getTracks().forEach(track=>track.stop());
+            stream
+            .getTracks()
+            .forEach(
+                track=>track.stop()
+            );
 
         }
 
-        stream=await navigator.mediaDevices.getUserMedia({
+
+        stream =
+        await navigator
+        .mediaDevices
+        .getUserMedia({
 
             video:{
                 facingMode:"user"
@@ -244,20 +895,33 @@ async function startCamera(){
 
         });
 
-        const video=document.getElementById("camera");
 
-        video.srcObject=stream;
+        const video =
+        document
+        .getElementById("camera");
+
+
+        video.srcObject =
+        stream;
+
 
         await video.play();
 
-        document.getElementById("status").innerText =
+
+        document
+        .getElementById("status")
+        .innerText =
         "📷 Camera started";
+
 
     }catch(error){
 
         console.error(error);
 
-        document.getElementById("status").innerText =
+
+        document
+        .getElementById("status")
+        .innerText =
         "❌ Camera permission required";
 
     }
@@ -282,38 +946,48 @@ const SCHOOL_RADIUS =
 
 async function setSchoolLocation(){
 
-    if(!navigator.geolocation){
+    if(!currentUser){
 
-        document.getElementById("status").innerText =
-        "❌ GPS is not supported";
+        alert("Pehle login karein.");
 
         return;
     }
 
 
-    document.getElementById("status").innerText =
-    "📍 School location check ho rahi hai...";
+    if(!navigator.geolocation){
+
+        alert("GPS supported nahi hai.");
+
+        return;
+    }
 
 
     try{
 
         const oldLocation =
         await getDoc(
-            doc(db,"settings",SCHOOL_LOCATION_DOC)
+            doc(
+                db,
+                "settings",
+                SCHOOL_LOCATION_DOC
+            )
         );
 
 
         if(oldLocation.exists()){
 
-            document.getElementById("status").innerText =
-            "⚠️ School location already set hai.";
-
             alert(
-                "School location pehle hi set ho chuki hai."
+                "School location pehle se set hai."
             );
 
             return;
         }
+
+
+        document
+        .getElementById("status")
+        .innerText =
+        "📍 School GPS location li ja rahi hai...";
 
 
         navigator.geolocation.getCurrentPosition(
@@ -333,37 +1007,50 @@ async function setSchoolLocation(){
                 try{
 
                     await setDoc(
-                        doc(db,"settings",SCHOOL_LOCATION_DOC),
+
+                        doc(
+                            db,
+                            "settings",
+                            SCHOOL_LOCATION_DOC
+                        ),
+
                         {
 
                             schoolName:
                             "Moon Star Public High School Khanwahan",
 
-                            latitude:latitude,
+                            latitude:
+                            latitude,
 
-                            longitude:longitude,
+                            longitude:
+                            longitude,
 
-                            radius:SCHOOL_RADIUS,
+                            radius:
+                            SCHOOL_RADIUS,
 
-                            accuracy:accuracy,
+                            accuracy:
+                            accuracy,
 
                             setAt:
                             new Date().toISOString()
 
                         }
+
                     );
 
 
-                    document.getElementById("status").innerText =
-                    "✅ School location save ho gayi";
+                    document
+                    .getElementById("status")
+                    .innerText =
+                    "✅ School location saved";
 
 
                     alert(
-                        "✅ School location successfully save ho gayi.\n\n" +
+                        "✅ School location save ho gayi.\n\n" +
                         "GPS Accuracy: " +
                         Math.round(accuracy) +
                         " meters\n\n" +
-                        "Attendance radius: 100 meters"
+                        "Radius: 100 meters"
                     );
 
 
@@ -371,11 +1058,8 @@ async function setSchoolLocation(){
 
                     console.error(error);
 
-                    document.getElementById("status").innerText =
-                    "❌ Location Firebase mein save nahi hui";
-
                     alert(
-                        "Firebase permission error.\n\n" +
+                        "Firebase permission error:\n\n" +
                         error.message
                     );
 
@@ -387,12 +1071,9 @@ async function setSchoolLocation(){
 
                 console.error(error);
 
-                document.getElementById("status").innerText =
-                "❌ GPS location nahi mili";
-
                 alert(
                     "GPS location nahi mili.\n\n" +
-                    "Phone ki Location ON karein aur browser ko location permission dein."
+                    "Phone ki Location ON karein aur permission Allow karein."
                 );
 
             },
@@ -413,8 +1094,7 @@ async function setSchoolLocation(){
 
         console.error(error);
 
-        document.getElementById("status").innerText =
-        "❌ Location check error";
+        alert(error.message);
 
     }
 
@@ -422,7 +1102,7 @@ async function setSchoolLocation(){
 
 
 /* =========================
-   DISTANCE CALCULATOR
+   DISTANCE
 ========================= */
 
 function calculateDistance(
@@ -434,19 +1114,28 @@ function calculateDistance(
 
     const R=6371000;
 
+
     const dLat =
-    (lat2-lat1)*Math.PI/180;
+    (lat2-lat1)
+    *Math.PI/180;
+
 
     const dLon =
-    (lon2-lon1)*Math.PI/180;
+    (lon2-lon1)
+    *Math.PI/180;
 
 
     const a =
     Math.sin(dLat/2) *
     Math.sin(dLat/2) +
 
-    Math.cos(lat1*Math.PI/180) *
-    Math.cos(lat2*Math.PI/180) *
+    Math.cos(
+        lat1*Math.PI/180
+    ) *
+
+    Math.cos(
+        lat2*Math.PI/180
+    ) *
 
     Math.sin(dLon/2) *
     Math.sin(dLon/2);
@@ -474,17 +1163,18 @@ async function checkSchoolLocation(){
 
         const locationDoc =
         await getDoc(
-            doc(db,"settings",SCHOOL_LOCATION_DOC)
+            doc(
+                db,
+                "settings",
+                SCHOOL_LOCATION_DOC
+            )
         );
 
 
         if(!locationDoc.exists()){
 
-            document.getElementById("status").innerText =
-            "❌ School location set nahi hai";
-
             alert(
-                "Pehle school mein jaakar 📍 Set School Location dabayein."
+                "School location abhi set nahi hai."
             );
 
             return false;
@@ -495,21 +1185,8 @@ async function checkSchoolLocation(){
         locationDoc.data();
 
 
-        return new Promise((resolve)=>{
-
-            if(!navigator.geolocation){
-
-                document.getElementById("status").innerText =
-                "❌ GPS supported nahi hai";
-
-                resolve(false);
-
-                return;
-            }
-
-
-            document.getElementById("status").innerText =
-            "📍 Aapki location check ho rahi hai...";
+        return new Promise(
+        (resolve)=>{
 
 
             navigator.geolocation.getCurrentPosition(
@@ -521,9 +1198,6 @@ async function checkSchoolLocation(){
 
                     const currentLon =
                     position.coords.longitude;
-
-                    const accuracy =
-                    position.coords.accuracy;
 
 
                     const distance =
@@ -542,32 +1216,40 @@ async function checkSchoolLocation(){
 
                     console.log(
                         "Distance:",
-                        distance,
-                        "Accuracy:",
-                        accuracy
+                        distance
                     );
 
 
-                    if(distance <= SCHOOL_RADIUS){
+                    if(
+                        distance <=
+                        SCHOOL_RADIUS
+                    ){
 
-                        document.getElementById("status").innerText =
+                        document
+                        .getElementById("status")
+                        .innerText =
                         "✅ School location verified (" +
                         Math.round(distance) +
                         "m)";
+
 
                         resolve(true);
 
                     }else{
 
-                        document.getElementById("status").innerText =
+                        document
+                        .getElementById("status")
+                        .innerText =
                         "❌ School se " +
                         Math.round(distance) +
-                        "m door hain";
+                        "m door";
+
 
                         alert(
                             "❌ Attendance nahi lagegi.\n\n" +
                             "Aap school ke 100 meter radius mein nahi hain."
                         );
+
 
                         resolve(false);
 
@@ -579,11 +1261,8 @@ async function checkSchoolLocation(){
 
                     console.error(error);
 
-                    document.getElementById("status").innerText =
-                    "❌ Current GPS location nahi mili";
-
                     alert(
-                        "Phone ki Location ON karein aur browser ko location permission dein."
+                        "Current GPS location nahi mili."
                     );
 
                     resolve(false);
@@ -609,12 +1288,57 @@ async function checkSchoolLocation(){
 
         console.error(error);
 
-        document.getElementById("status").innerText =
-        "❌ GPS verification error";
-
         return false;
 
     }
+
+}
+
+
+/* =========================
+   GET TEACHER NAME
+========================= */
+
+async function getMyTeacherName(){
+
+    if(!currentUser){
+
+        return null;
+    }
+
+
+    if(currentUser.displayName){
+
+        return currentUser.displayName;
+    }
+
+
+    try{
+
+        const accountDoc =
+        await getDoc(
+            doc(
+                db,
+                "teacherAccounts",
+                currentUser.uid
+            )
+        );
+
+
+        if(accountDoc.exists()){
+
+            return accountDoc.data().name;
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+
+    return null;
 
 }
 
@@ -625,31 +1349,46 @@ async function checkSchoolLocation(){
 
 async function registerFace(){
 
+    if(!currentUser){
+
+        alert("Pehle login karein.");
+
+        return;
+    }
+
+
     if(!faceapiLoaded){
 
-        alert("Face system abhi load ho raha hai.");
+        alert(
+            "Face system abhi load ho raha hai."
+        );
 
         return;
     }
 
 
     const name =
-    document.getElementById("name").value.trim();
+    await getMyTeacherName();
 
 
     if(!name){
 
-        alert("Teacher name likhein.");
+        alert(
+            "Teacher name account mein nahi mila."
+        );
 
         return;
     }
 
 
     const video =
-    document.getElementById("camera");
+    document
+    .getElementById("camera");
 
 
-    document.getElementById("status").innerText =
+    document
+    .getElementById("status")
+    .innerText =
     "👤 Face detect ho raha hai...";
 
 
@@ -657,20 +1396,32 @@ async function registerFace(){
 
         const detection =
         await faceapi
+
         .detectSingleFace(
+
             video,
-            new faceapi.TinyFaceDetectorOptions({
+
+            new faceapi
+            .TinyFaceDetectorOptions({
+
                 inputSize:320,
+
                 scoreThreshold:0.4
+
             })
+
         )
+
         .withFaceLandmarks()
+
         .withFaceDescriptor();
 
 
         if(!detection){
 
-            document.getElementById("status").innerText =
+            document
+            .getElementById("status")
+            .innerText =
             "❌ Face detect nahi hua";
 
             return;
@@ -683,49 +1434,52 @@ async function registerFace(){
         );
 
 
-        let existing=false;
+        let alreadyRegistered=false;
 
 
-        teachersSnapshot.forEach(docSnap=>{
+        teachersSnapshot.forEach(
+        docSnap=>{
 
-            const data=docSnap.data();
+            const teacher =
+            docSnap.data();
+
 
             if(
-                data.name &&
-                data.name.toLowerCase() ===
-                name.toLowerCase()
+                teacher.uid ===
+                currentUser.uid
             ){
 
-                existing=true;
+                alreadyRegistered=true;
 
             }
 
         });
 
 
-        if(existing){
+        if(alreadyRegistered){
 
-            const confirmRegister =
-            confirm(
-                "Is teacher ka face pehle se registered hai.\n\nPhir bhi register karna hai?"
+            alert(
+                "Aapka face pehle se registered hai."
             );
 
-            if(!confirmRegister){
-
-                document.getElementById("status").innerText =
-                "Registration cancelled";
-
-                return;
-            }
-
+            return;
         }
 
 
         await addDoc(
+
             collection(db,"teachers"),
+
             {
 
-                name:name,
+                uid:
+                currentUser.uid,
+
+                name:
+                name,
+
+                email:
+                currentUser.email,
 
                 descriptor:
                 Array.from(
@@ -736,14 +1490,20 @@ async function registerFace(){
                 new Date().toISOString()
 
             }
+
         );
 
 
-        document.getElementById("status").innerText =
-        "✅ " + name + " ka face register ho gaya";
+        document
+        .getElementById("status")
+        .innerText =
+        "✅ " +
+        name +
+        " ka face register ho gaya";
+
 
         alert(
-            "✅ Face successfully registered."
+            "✅ Aapka face successfully registered ho gaya."
         );
 
 
@@ -751,8 +1511,11 @@ async function registerFace(){
 
         console.error(error);
 
-        document.getElementById("status").innerText =
+        document
+        .getElementById("status")
+        .innerText =
         "❌ Face registration error";
+
 
         alert(error.message);
 
@@ -767,27 +1530,25 @@ async function registerFace(){
 
 async function checkFace(){
 
+    if(!currentUser){
+
+        alert("Pehle login karein.");
+
+        return;
+    }
+
+
     if(!faceapiLoaded){
 
-        alert("Face system abhi load ho raha hai.");
+        alert(
+            "Face system abhi load ho raha hai."
+        );
 
         return;
     }
 
 
-    const nameInput =
-    document.getElementById("name").value.trim();
-
-
-    if(!nameInput){
-
-        alert("Teacher name likhein.");
-
-        return;
-    }
-
-
-    /* LOCATION FIRST */
+    /* LOCATION */
 
     const locationOK =
     await checkSchoolLocation();
@@ -800,10 +1561,17 @@ async function checkFace(){
 
 
     const video =
-    document.getElementById("camera");
+    document
+    .getElementById("camera");
 
 
-    document.getElementById("status").innerText =
+    const myName =
+    await getMyTeacherName();
+
+
+    document
+    .getElementById("status")
+    .innerText =
     "👤 Face match ho raha hai...";
 
 
@@ -811,20 +1579,32 @@ async function checkFace(){
 
         const detection =
         await faceapi
+
         .detectSingleFace(
+
             video,
-            new faceapi.TinyFaceDetectorOptions({
+
+            new faceapi
+            .TinyFaceDetectorOptions({
+
                 inputSize:320,
+
                 scoreThreshold:0.4
+
             })
+
         )
+
         .withFaceLandmarks()
+
         .withFaceDescriptor();
 
 
         if(!detection){
 
-            document.getElementById("status").innerText =
+            document
+            .getElementById("status")
+            .innerText =
             "❌ Face detect nahi hua";
 
             return;
@@ -842,15 +1622,26 @@ async function checkFace(){
         let bestDistance=Infinity;
 
 
-        teachersSnapshot.forEach(docSnap=>{
+        teachersSnapshot.forEach(
+        docSnap=>{
 
             const teacher =
             docSnap.data();
 
 
+            /* Only logged-in teacher */
+
             if(
-                !teacher.descriptor ||
-                !teacher.name
+                teacher.uid !==
+                currentUser.uid
+            ){
+
+                return;
+            }
+
+
+            if(
+                !teacher.descriptor
             ){
 
                 return;
@@ -865,16 +1656,24 @@ async function checkFace(){
 
             const distance =
             faceapi.euclideanDistance(
+
                 detection.descriptor,
+
                 savedDescriptor
+
             );
 
 
-            if(distance < bestDistance){
+            if(
+                distance <
+                bestDistance
+            ){
 
-                bestDistance=distance;
+                bestDistance =
+                distance;
 
-                bestMatch=teacher;
+                bestMatch =
+                teacher;
 
             }
 
@@ -886,22 +1685,35 @@ async function checkFace(){
             bestDistance >= 0.55
         ){
 
-            document.getElementById("status").innerText =
-            "❌ Face match nahi hua";
+            document
+            .getElementById("status")
+            .innerText =
+            "❌ Aapka face match nahi hua";
+
+
+            alert(
+                "Face match nahi hua.\n\n" +
+                "Agar pehli baar hai to Register My Face karein."
+            );
+
 
             return;
         }
 
 
         const today =
-        new Date().toLocaleDateString();
+        new Date()
+        .toLocaleDateString();
 
 
         const now =
-        new Date().toLocaleTimeString();
+        new Date()
+        .toLocaleTimeString();
 
 
-        /* DUPLICATE CHECK */
+        /* =========================
+           DUPLICATE CHECK
+        ========================= */
 
         const attendanceSnapshot =
         await getDocs(
@@ -912,7 +1724,8 @@ async function checkFace(){
         let alreadyPresent=false;
 
 
-        attendanceSnapshot.forEach(docSnap=>{
+        attendanceSnapshot.forEach(
+        docSnap=>{
 
             const record =
             docSnap.data();
@@ -920,16 +1733,14 @@ async function checkFace(){
 
             if(
 
-                record.name &&
-                record.date &&
-                record.status &&
+                record.uid ===
+                currentUser.uid &&
 
-                record.name.toLowerCase() ===
-                bestMatch.name.toLowerCase() &&
+                record.date ===
+                today &&
 
-                record.date === today &&
-
-                record.status === "Present"
+                record.status ===
+                "Present"
 
             ){
 
@@ -942,14 +1753,16 @@ async function checkFace(){
 
         if(alreadyPresent){
 
-            document.getElementById("status").innerText =
+            document
+            .getElementById("status")
+            .innerText =
             "⚠️ Aaj attendance already lag chuki hai";
 
+
             alert(
-                "⚠️ " +
-                bestMatch.name +
-                " ki aaj ki attendance already present hai."
+                "⚠️ Aaj aapki attendance already present hai."
             );
+
 
             return;
         }
@@ -957,13 +1770,23 @@ async function checkFace(){
 
         const attendance={
 
-            name:bestMatch.name,
+            uid:
+            currentUser.uid,
 
-            status:"Present",
+            name:
+            bestMatch.name,
 
-            date:today,
+            email:
+            currentUser.email,
 
-            time:now
+            status:
+            "Present",
+
+            date:
+            today,
+
+            time:
+            now
 
         };
 
@@ -981,8 +1804,13 @@ async function checkFace(){
 
         const history =
         JSON.parse(
-            localStorage.getItem("attendanceHistory") ||
+
+            localStorage.getItem(
+                "attendanceHistory_" +
+                currentUser.uid
+            ) ||
             "[]"
+
         );
 
 
@@ -990,22 +1818,33 @@ async function checkFace(){
 
 
         localStorage.setItem(
-            "attendanceHistory",
+
+            "attendanceHistory_" +
+            currentUser.uid,
+
             JSON.stringify(history)
+
         );
 
 
-        document.getElementById("status").innerText =
-        "✅ Attendance marked & Firebase mein save ho gayi";
+        document
+        .getElementById("status")
+        .innerText =
+        "✅ Attendance marked successfully";
 
 
         alert(
+
             "✅ Attendance successful!\n\n" +
+
             bestMatch.name +
             "\n" +
+
             today +
             "\n" +
+
             now
+
         );
 
 
@@ -1013,8 +1852,12 @@ async function checkFace(){
 
         console.error(error);
 
-        document.getElementById("status").innerText =
+
+        document
+        .getElementById("status")
+        .innerText =
         "❌ Attendance error";
+
 
         alert(
             "Attendance error:\n\n" +
@@ -1032,15 +1875,29 @@ async function checkFace(){
 
 function showHistory(){
 
+    if(!currentUser){
+
+        return;
+    }
+
+
     const history =
     JSON.parse(
-        localStorage.getItem("attendanceHistory") ||
+
+        localStorage.getItem(
+
+            "attendanceHistory_" +
+            currentUser.uid
+
+        ) ||
         "[]"
+
     );
 
 
     const historyDiv =
-    document.getElementById("history");
+    document
+    .getElementById("history");
 
 
     if(history.length===0){
@@ -1052,29 +1909,45 @@ function showHistory(){
     }
 
 
-    let html="<h3>Attendance History</h3>";
+    let html =
+    "<h3>My Attendance History</h3>";
 
 
     history
     .slice()
     .reverse()
-    .forEach(record=>{
+    .forEach(
+    record=>{
 
         html +=
+
         "<p>" +
-        "👤 " + record.name +
+
+        "👤 " +
+        record.name +
+
         "<br>" +
-        "📅 " + record.date +
+
+        "📅 " +
+        record.date +
+
         "<br>" +
-        "⏰ " + record.time +
+
+        "⏰ " +
+        record.time +
+
         "<br>" +
-        "✅ " + record.status +
+
+        "✅ " +
+        record.status +
+
         "</p><hr>";
 
     });
 
 
-    historyDiv.innerHTML=html;
+    historyDiv.innerHTML =
+    html;
 
 }
 
@@ -1085,6 +1958,12 @@ function showHistory(){
 
 function clearHistory(){
 
+    if(!currentUser){
+
+        return;
+    }
+
+
     if(
         confirm(
             "Local history clear karni hai?"
@@ -1092,13 +1971,22 @@ function clearHistory(){
     ){
 
         localStorage.removeItem(
-            "attendanceHistory"
+
+            "attendanceHistory_" +
+            currentUser.uid
+
         );
 
-        document.getElementById("history").innerHTML =
+
+        document
+        .getElementById("history")
+        .innerHTML =
         "";
 
-        document.getElementById("status").innerText =
+
+        document
+        .getElementById("status")
+        .innerText =
         "🗑️ Local history cleared";
 
     }
@@ -1109,6 +1997,21 @@ function clearHistory(){
 /* =========================
    BUTTON FUNCTIONS
 ========================= */
+
+window.showSignup =
+showSignup;
+
+window.showLogin =
+showLogin;
+
+window.signup =
+signup;
+
+window.login =
+login;
+
+window.logout =
+logout;
 
 window.startCamera =
 startCamera;
@@ -1130,7 +2033,7 @@ clearHistory;
 
 
 /* =========================
-   START
+   START FACE API
 ========================= */
 
 loadFaceApi();
