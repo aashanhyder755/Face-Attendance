@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>Principal Record - Teacher Attendance</title>
 
+
 <style>
+
 *{
     box-sizing:border-box;
 }
@@ -63,7 +69,8 @@ body{
     margin-bottom:15px;
 }
 
-input,button{
+input,
+button{
     padding:11px;
     border-radius:6px;
     border:1px solid #ccc;
@@ -98,10 +105,6 @@ button:hover{
     background:#6c757d;
 }
 
-.red{
-    background:#dc3545;
-}
-
 .record{
     border:1px solid #ddd;
     border-radius:10px;
@@ -120,7 +123,8 @@ table{
     margin-top:12px;
 }
 
-th,td{
+th,
+td{
     border:1px solid #aaa;
     padding:7px;
     text-align:center;
@@ -166,93 +170,6 @@ th{
 }
 
 
-/* ================= PRINT ================= */
-
-@media print{
-
-    body{
-        background:white !important;
-        margin:0 !important;
-        padding:0 !important;
-    }
-
-    .header{
-        display:none !important;
-    }
-
-    .controls{
-        display:none !important;
-    }
-
-    button,
-    input{
-        display:none !important;
-    }
-
-    .section{
-        box-shadow:none !important;
-        border:none !important;
-        margin:0 !important;
-        padding:10px !important;
-        border-radius:0 !important;
-    }
-
-    /*
-       Default: print only selected area
-    */
-
-    body.print-attendance #monthlySection{
-        display:none !important;
-    }
-
-    body.print-attendance #attendanceSection{
-        display:block !important;
-    }
-
-    body.print-reports #attendanceSection{
-        display:none !important;
-    }
-
-    body.print-reports #monthlySection{
-        display:block !important;
-    }
-
-    body.print-reports #reportsList{
-        display:block !important;
-    }
-
-    body.print-reports .report{
-        page-break-inside:avoid;
-        margin-bottom:20px;
-    }
-
-    body.print-attendance .record{
-        page-break-inside:avoid;
-        border:1px solid #999;
-        margin-bottom:8px;
-        background:white;
-    }
-
-    .report{
-        page-break-inside:avoid;
-        border:2px solid #000;
-        background:white;
-    }
-
-    table{
-        width:100% !important;
-    }
-
-    th,td{
-        border:1px solid #000 !important;
-        color:#000 !important;
-    }
-
-}
-
-
-/* ================= MOBILE ================= */
-
 @media(max-width:600px){
 
     .report-info{
@@ -263,7 +180,8 @@ th{
         font-size:11px;
     }
 
-    th,td{
+    th,
+    td{
         padding:5px 3px;
     }
 
@@ -276,172 +194,257 @@ th{
     }
 
 }
+
 </style>
+
 </head>
+
 
 <body>
 
+
+<!-- ================= HEADER ================= -->
+
 <div class="header">
-    <h1>Moon Star Public High School Khanwahan</h1>
-    <p>Principal Record</p>
+
+    <h1>
+        Moon Star Public High School Khanwahan
+    </h1>
+
+    <p>
+        Principal Record
+    </p>
+
 </div>
 
 
 <div class="container">
 
 
-<!-- ================= ATTENDANCE ================= -->
+<!-- ================================================= -->
+<!-- TEACHER ATTENDANCE -->
+<!-- ================================================= -->
 
 <div class="section" id="attendanceSection">
 
-<h2>📋 Teacher Attendance</h2>
-
-<div class="controls">
-
-<input
-    type="text"
-    id="teacherSearch"
-    placeholder="Search Teacher Name"
->
-
-<input
-    type="date"
-    id="dateSearch"
->
-
-<button onclick="searchAttendance()">
-    🔎 Search
-</button>
-
-<button class="green" onclick="loadAttendance()">
-    🔄 Refresh
-</button>
-
-<button class="orange" onclick="printAttendance()">
-    🖨️ Print Attendance
-</button>
-
-</div>
+    <h2>
+        📋 Teacher Attendance
+    </h2>
 
 
-<div id="attendanceTotal">
-    Total Records: 0
-</div>
+    <div class="controls">
+
+        <input
+            type="text"
+            id="teacherSearch"
+            placeholder="Search Teacher Name"
+        >
 
 
-<div id="attendanceList">
-    <div class="no-data">
-        Loading attendance...
+        <input
+            type="date"
+            id="dateSearch"
+        >
+
+
+        <button
+            onclick="searchAttendance()"
+        >
+            🔎 Search
+        </button>
+
+
+        <button
+            class="green"
+            onclick="loadAttendance()"
+        >
+            🔄 Refresh
+        </button>
+
+
+        <button
+            class="orange"
+            onclick="printAttendance()"
+        >
+            🖨️ Print Attendance
+        </button>
+
     </div>
-</div>
+
+
+    <div id="attendanceTotal">
+        Total Records: 0
+    </div>
+
+
+    <div id="attendanceList">
+
+        <div class="no-data">
+            Loading attendance...
+        </div>
+
+    </div>
 
 </div>
 
 
-<!-- ================= MONTHLY REPORT ================= -->
+
+<!-- ================================================= -->
+<!-- MONTHLY REPORTS -->
+<!-- ================================================= -->
 
 <div class="section" id="monthlySection">
 
-<h2>📊 Teacher Monthly Reports</h2>
-
-<div class="controls">
-
-<input
-    type="text"
-    id="reportTeacherSearch"
-    placeholder="Search Teacher Name"
->
-
-<input
-    type="month"
-    id="reportMonthSearch"
->
-
-<button onclick="searchReports()">
-    🔎 Search Reports
-</button>
-
-<button class="green" onclick="loadReports()">
-    🔄 Refresh Reports
-</button>
-
-<button class="gray" onclick="showAllReports()">
-    📋 Show All Reports
-</button>
-
-<button class="orange" onclick="printReports()">
-    🖨️ Print Reports
-</button>
-
-</div>
+    <h2>
+        📊 Teacher Monthly Reports
+    </h2>
 
 
-<div id="reportTotal">
-    Total Reports: 0
-</div>
+    <div class="controls">
+
+        <input
+            type="text"
+            id="reportTeacherSearch"
+            placeholder="Search Teacher Name"
+        >
 
 
-<div id="reportsList">
-    <div class="no-data">
-        Loading monthly reports...
+        <input
+            type="month"
+            id="reportMonthSearch"
+        >
+
+
+        <button
+            onclick="searchReports()"
+        >
+            🔎 Search Reports
+        </button>
+
+
+        <button
+            class="green"
+            onclick="loadReports()"
+        >
+            🔄 Refresh Reports
+        </button>
+
+
+        <button
+            class="gray"
+            onclick="showAllReports()"
+        >
+            📋 Show All Reports
+        </button>
+
+
+        <button
+            class="orange"
+            onclick="printReports()"
+        >
+            🖨️ Print Reports
+        </button>
+
     </div>
-</div>
+
+
+    <div id="reportTotal">
+        Total Reports: 0
+    </div>
+
+
+    <div id="reportsList">
+
+        <div class="no-data">
+            Loading monthly reports...
+        </div>
+
+    </div>
 
 </div>
 
+
 </div>
+
 
 
 <script type="module">
 
 
-/* ================= FIREBASE ================= */
+/* ================================================= */
+/* FIREBASE */
+/* ================================================= */
 
 import {
     initializeApp
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+}
+from
+"https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
 
 
 import {
     getFirestore,
     collection,
     getDocs
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+}
+from
+"https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
 const firebaseConfig = {
 
-    apiKey:"AIzaSyBguAzVWGP_NUyObdv2Fsreu8pvPycSgzE",
+    apiKey:
+    "AIzaSyBguAzVWGP_NUyObdv2Fsreu8pvPycSgzE",
 
-    authDomain:"teachers-face-attendance.firebaseapp.com",
+    authDomain:
+    "teachers-face-attendance.firebaseapp.com",
 
-    projectId:"teachers-face-attendance",
+    projectId:
+    "teachers-face-attendance",
 
-    storageBucket:"teachers-face-attendance.firebasestorage.app",
+    storageBucket:
+    "teachers-face-attendance.firebasestorage.app",
 
-    messagingSenderId:"63876838606",
+    messagingSenderId:
+    "63876838606",
 
-    appId:"1:63876838606:web:572e240079865aabbc4c9f",
+    appId:
+    "1:63876838606:web:572e240079865aabbc4c9f",
 
-    measurementId:"G-XN93NKWLY5"
+    measurementId:
+    "G-XN93NKWLY5"
 
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+
+const db =
+    getFirestore(app);
 
 
-/* ================= ATTENDANCE ================= */
+
+/* ================================================= */
+/* ATTENDANCE DATA */
+/* ================================================= */
 
 let attendanceData = [];
 
 
+
+/* ================================================= */
+/* LOAD ATTENDANCE */
+/* ================================================= */
+
 async function loadAttendance(){
 
     const list =
-        document.getElementById("attendanceList");
+        document.getElementById(
+            "attendanceList"
+        );
+
 
     list.innerHTML =
         '<div class="no-data">Loading attendance...</div>';
@@ -451,7 +454,10 @@ async function loadAttendance(){
 
         const snapshot =
             await getDocs(
-                collection(db,"attendance")
+                collection(
+                    db,
+                    "attendance"
+                )
             );
 
 
@@ -471,16 +477,21 @@ async function loadAttendance(){
         });
 
 
-        displayAttendance(attendanceData);
+        displayAttendance(
+            attendanceData
+        );
 
 
-    }catch(error){
+    }
+    catch(error){
 
         console.error(error);
 
+
         list.innerHTML =
-            "<div class='no-data'>Attendance load error: "
-            + escapeHtml(error.message) +
+            "<div class='no-data'>" +
+            "Attendance load error: " +
+            escapeHtml(error.message) +
             "</div>";
 
     }
@@ -488,36 +499,55 @@ async function loadAttendance(){
 }
 
 
-/* ================= DISPLAY ATTENDANCE ================= */
+
+/* ================================================= */
+/* DISPLAY ATTENDANCE */
+/* ================================================= */
 
 function displayAttendance(data){
 
     const list =
-        document.getElementById("attendanceList");
+        document.getElementById(
+            "attendanceList"
+        );
 
 
-    document.getElementById("attendanceTotal").innerText =
-        "Total Records: " + data.length;
+    document.getElementById(
+        "attendanceTotal"
+    ).innerText =
+        "Total Records: " +
+        data.length;
 
 
     if(data.length === 0){
 
         list.innerHTML =
-            '<div class="no-data">No attendance records found.</div>';
+            '<div class="no-data">' +
+            'No attendance records found.' +
+            '</div>';
 
         return;
+
     }
 
 
     data.sort((a,b)=>{
 
         const aTime =
-            (a.date || "") + " " + (a.time || "");
+            (a.date || "") +
+            " " +
+            (a.time || "");
+
 
         const bTime =
-            (b.date || "") + " " + (b.time || "");
+            (b.date || "") +
+            " " +
+            (b.time || "");
 
-        return bTime.localeCompare(aTime);
+
+        return bTime.localeCompare(
+            aTime
+        );
 
     });
 
@@ -528,24 +558,30 @@ function displayAttendance(data){
     data.forEach(item=>{
 
         const div =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
-        div.className = "record";
+        div.className =
+            "record";
 
 
         div.innerHTML = `
 
             <strong>Teacher:</strong>
             ${escapeHtml(item.name || "-")}
+
             <br>
 
             <strong>Status:</strong>
             ${escapeHtml(item.status || "-")}
+
             <br>
 
             <strong>Date:</strong>
             ${escapeHtml(item.date || "-")}
+
             <br>
 
             <strong>Time:</strong>
@@ -561,75 +597,106 @@ function displayAttendance(data){
 }
 
 
-/* ================= SEARCH ATTENDANCE ================= */
+
+/* ================================================= */
+/* SEARCH ATTENDANCE */
+/* ================================================= */
 
 function searchAttendance(){
 
     const name =
-        document.getElementById("teacherSearch")
+        document
+        .getElementById(
+            "teacherSearch"
+        )
         .value
         .trim()
         .toLowerCase();
 
 
     const date =
-        document.getElementById("dateSearch")
+        document
+        .getElementById(
+            "dateSearch"
+        )
         .value
         .trim();
 
 
     const filtered =
-        attendanceData.filter(item=>{
+        attendanceData.filter(
+            item=>{
 
-            const itemName =
-                (item.name || "")
-                .toLowerCase();
-
-
-            const itemDate =
-                item.date || "";
-
-
-            return (
-
-                (!name ||
-                itemName.includes(name))
-
-                &&
-
-                (!date ||
-                itemDate === date)
-
-            );
-
-        });
+                const itemName =
+                    (
+                        item.name ||
+                        ""
+                    )
+                    .toLowerCase();
 
 
-    displayAttendance(filtered);
+                const itemDate =
+                    item.date || "";
+
+
+                return (
+
+                    (!name ||
+                    itemName.includes(name))
+
+                    &&
+
+                    (!date ||
+                    itemDate === date)
+
+                );
+
+            }
+        );
+
+
+    displayAttendance(
+        filtered
+    );
 
 }
 
 
-/* ================= MONTHLY REPORTS ================= */
+
+/* ================================================= */
+/* MONTHLY REPORT DATA */
+/* ================================================= */
 
 let reportsData = [];
 
 
+
+/* ================================================= */
+/* LOAD REPORTS */
+/* ================================================= */
+
 async function loadReports(){
 
     const list =
-        document.getElementById("reportsList");
+        document.getElementById(
+            "reportsList"
+        );
 
 
     list.innerHTML =
-        '<div class="no-data">Loading monthly reports...</div>';
+        '<div class="no-data">' +
+        'Loading monthly reports...' +
+        '</div>';
 
 
     try{
 
         const snapshot =
             await getDocs(
-                collection(db,"monthlyReports")
+                collection(
+                    db,
+                    "monthlyReports"
+                )
             );
 
 
@@ -649,16 +716,21 @@ async function loadReports(){
         });
 
 
-        displayReports(reportsData);
+        displayReports(
+            reportsData
+        );
 
 
-    }catch(error){
+    }
+    catch(error){
 
         console.error(error);
 
+
         list.innerHTML =
-            "<div class='no-data'>Monthly reports load error: "
-            + escapeHtml(error.message) +
+            "<div class='no-data'>" +
+            "Monthly reports load error: " +
+            escapeHtml(error.message) +
             "</div>";
 
     }
@@ -666,22 +738,32 @@ async function loadReports(){
 }
 
 
-/* ================= DISPLAY REPORTS ================= */
+
+/* ================================================= */
+/* DISPLAY REPORTS */
+/* ================================================= */
 
 function displayReports(data){
 
     const list =
-        document.getElementById("reportsList");
+        document.getElementById(
+            "reportsList"
+        );
 
 
-    document.getElementById("reportTotal").innerText =
-        "Total Reports: " + data.length;
+    document.getElementById(
+        "reportTotal"
+    ).innerText =
+        "Total Reports: " +
+        data.length;
 
 
     if(data.length === 0){
 
         list.innerHTML =
-            '<div class="no-data">No monthly reports found.</div>';
+            '<div class="no-data">' +
+            'No monthly reports found.' +
+            '</div>';
 
         return;
 
@@ -693,9 +775,13 @@ function displayReports(data){
 
     data.sort((a,b)=>{
 
-        return String(b.month || "")
+        return String(
+            b.month || ""
+        )
         .localeCompare(
-            String(a.month || "")
+            String(
+                a.month || ""
+            )
         );
 
     });
@@ -704,10 +790,13 @@ function displayReports(data){
     data.forEach(report=>{
 
         const div =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
-        div.className = "report";
+        div.className =
+            "report";
 
 
         div.innerHTML = `
@@ -725,26 +814,47 @@ function displayReports(data){
             <div class="report-info">
 
                 <div>
-                    <strong>Teacher Name:</strong><br>
+
+                    <strong>
+                        Teacher Name:
+                    </strong>
+
+                    <br>
+
                     ${escapeHtml(
                         report.teacherName || "-"
                     )}
+
                 </div>
 
 
                 <div>
-                    <strong>Month:</strong><br>
+
+                    <strong>
+                        Month:
+                    </strong>
+
+                    <br>
+
                     ${escapeHtml(
                         report.month || "-"
                     )}
+
                 </div>
 
 
                 <div>
-                    <strong>Class:</strong><br>
+
+                    <strong>
+                        Class:
+                    </strong>
+
+                    <br>
+
                     ${escapeHtml(
                         report.className || "-"
                     )}
+
                 </div>
 
             </div>
@@ -756,17 +866,29 @@ function displayReports(data){
 
                     <tr>
 
-                        <th>Subject</th>
+                        <th>
+                            Subject
+                        </th>
 
-                        <th>Total</th>
+                        <th>
+                            Total
+                        </th>
 
-                        <th>Read</th>
+                        <th>
+                            Read
+                        </th>
 
-                        <th>Write</th>
+                        <th>
+                            Write
+                        </th>
 
-                        <th>Checked</th>
+                        <th>
+                            Checked
+                        </th>
 
-                        <th>Unchecked</th>
+                        <th>
+                            Unchecked
+                        </th>
 
                     </tr>
 
@@ -848,18 +970,27 @@ function displayReports(data){
         `;
 
 
-        list.appendChild(div);
+        list.appendChild(
+            div
+        );
 
     });
 
 }
 
 
-/* ================= SUBJECT ROW ================= */
 
-function subjectRow(name,data){
+/* ================================================= */
+/* SUBJECT ROW */
+/* ================================================= */
 
-    data = data || {};
+function subjectRow(
+    name,
+    data
+){
+
+    data =
+        data || {};
 
 
     return `
@@ -897,12 +1028,16 @@ function subjectRow(name,data){
 }
 
 
-/* ================= SEARCH REPORTS ================= */
+
+/* ================================================= */
+/* SEARCH REPORTS */
+/* ================================================= */
 
 function searchReports(){
 
     const teacher =
-        document.getElementById(
+        document
+        .getElementById(
             "reportTeacherSearch"
         )
         .value
@@ -911,7 +1046,8 @@ function searchReports(){
 
 
     const month =
-        document.getElementById(
+        document
+        .getElementById(
             "reportMonthSearch"
         )
         .value
@@ -919,12 +1055,571 @@ function searchReports(){
 
 
     const filtered =
-        reportsData.filter(report=>{
+        reportsData.filter(
+            report=>{
 
-            const name =
-                (report.teacherName || "")
-                .toLowerCase();
+                const name =
+                    (
+                        report.teacherName ||
+                        ""
+                    )
+                    .toLowerCase();
 
 
-            const reportMonth =
-                report.month || ""
+                const reportMonth =
+                    report.month || "";
+
+
+                return (
+
+                    (!teacher ||
+                    name.includes(teacher))
+
+                    &&
+
+                    (!month ||
+                    reportMonth === month)
+
+                );
+
+            }
+        );
+
+
+    displayReports(
+        filtered
+    );
+
+}
+
+
+
+/* ================================================= */
+/* SHOW ALL REPORTS */
+/* ================================================= */
+
+function showAllReports(){
+
+    document.getElementById(
+        "reportTeacherSearch"
+    ).value = "";
+
+
+    document.getElementById(
+        "reportMonthSearch"
+    ).value = "";
+
+
+    displayReports(
+        reportsData
+    );
+
+}
+
+
+
+/* ================================================= */
+/* PRINT ATTENDANCE */
+/* ================================================= */
+
+function printAttendance(){
+
+    const list =
+        document.getElementById(
+            "attendanceList"
+        );
+
+
+    const records =
+        list.querySelectorAll(
+            ".record"
+        );
+
+
+    if(records.length === 0){
+
+        alert(
+            "Print karne ke liye attendance record nahi hai."
+        );
+
+        return;
+
+    }
+
+
+    let recordsHTML = "";
+
+
+    records.forEach(record=>{
+
+        recordsHTML +=
+            record.outerHTML;
+
+    });
+
+
+    const total =
+        document.getElementById(
+            "attendanceTotal"
+        ).innerText;
+
+
+    const printWindow =
+        window.open(
+            "",
+            "_blank",
+            "width=900,height=700"
+        );
+
+
+    if(!printWindow){
+
+        alert(
+            "Print window blocked hai. Chrome mein pop-up allow karein."
+        );
+
+        return;
+
+    }
+
+
+    printWindow.document.open();
+
+
+    printWindow.document.write(`
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Teacher Attendance
+</title>
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    margin:0;
+    padding:25px;
+    color:#000;
+    background:#fff;
+}
+
+.school-name{
+    text-align:center;
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:7px;
+}
+
+.title{
+    text-align:center;
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:20px;
+}
+
+.total{
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.record{
+    border:1px solid #000;
+    padding:12px;
+    margin-bottom:9px;
+    page-break-inside:avoid;
+}
+
+.record strong{
+    color:#000;
+}
+
+@media print{
+
+    body{
+        padding:10px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="school-name">
+Moon Star Public High School Khanwahan
+</div>
+
+
+<div class="title">
+Teacher Attendance
+</div>
+
+
+<div class="total">
+${total}
+</div>
+
+
+${recordsHTML}
+
+
+<script>
+
+window.onload = function(){
+
+    setTimeout(function(){
+
+        window.print();
+
+    },700);
+
+};
+
+<\/script>
+
+
+</body>
+
+</html>
+
+    `);
+
+
+    printWindow.document.close();
+
+}
+
+
+
+/* ================================================= */
+/* PRINT MONTHLY REPORTS */
+/* ================================================= */
+
+function printReports(){
+
+    const list =
+        document.getElementById(
+            "reportsList"
+        );
+
+
+    const reports =
+        list.querySelectorAll(
+            ".report"
+        );
+
+
+    if(reports.length === 0){
+
+        alert(
+            "Print karne ke liye monthly report nahi hai."
+        );
+
+        return;
+
+    }
+
+
+    let reportsHTML = "";
+
+
+    reports.forEach(report=>{
+
+        reportsHTML +=
+            report.outerHTML;
+
+    });
+
+
+    const total =
+        document.getElementById(
+            "reportTotal"
+        ).innerText;
+
+
+    const printWindow =
+        window.open(
+            "",
+            "_blank",
+            "width=1000,height=800"
+        );
+
+
+    if(!printWindow){
+
+        alert(
+            "Print window blocked hai. Chrome mein pop-up allow karein."
+        );
+
+        return;
+
+    }
+
+
+    printWindow.document.open();
+
+
+    printWindow.document.write(`
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Teacher Monthly Reports
+</title>
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    margin:0;
+    padding:25px;
+    color:#000;
+    background:#fff;
+}
+
+.main-school{
+    text-align:center;
+    font-size:25px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.main-title{
+    text-align:center;
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.total{
+    font-weight:bold;
+    margin-bottom:15px;
+}
+
+.report{
+    border:2px solid #000;
+    padding:18px;
+    margin-bottom:20px;
+    page-break-inside:avoid;
+    background:#fff;
+}
+
+.school-name{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:5px;
+}
+
+.report-title{
+    text-align:center;
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:18px;
+}
+
+.report-info{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+}
+
+th,
+td{
+    border:1px solid #000;
+    padding:7px;
+    text-align:center;
+    font-size:13px;
+}
+
+th{
+    font-weight:bold;
+}
+
+@media print{
+
+    body{
+        padding:10px;
+    }
+
+    .report{
+        page-break-inside:avoid;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="main-school">
+Moon Star Public High School Khanwahan
+</div>
+
+
+<div class="main-title">
+Teacher Monthly Reports
+</div>
+
+
+<div class="total">
+${total}
+</div>
+
+
+${reportsHTML}
+
+
+<script>
+
+window.onload = function(){
+
+    setTimeout(function(){
+
+        window.print();
+
+    },700);
+
+};
+
+<\/script>
+
+
+</body>
+
+</html>
+
+    `);
+
+
+    printWindow.document.close();
+
+}
+
+
+
+/* ================================================= */
+/* ESCAPE HTML */
+/* ================================================= */
+
+function escapeHtml(value){
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+
+/* ================================================= */
+/* GLOBAL FUNCTIONS */
+/* ================================================= */
+
+window.loadAttendance =
+    loadAttendance;
+
+window.searchAttendance =
+    searchAttendance;
+
+window.printAttendance =
+    printAttendance;
+
+window.loadReports =
+    loadReports;
+
+window.searchReports =
+    searchReports;
+
+window.showAllReports =
+    showAllReports;
+
+window.printReports =
+    printReports;
+
+
+
+/* ================================================= */
+/* START */
+/* ================================================= */
+
+loadAttendance();
+
+loadReports();
+
+
+</script>
+
+
+</body>
+
+</html>
