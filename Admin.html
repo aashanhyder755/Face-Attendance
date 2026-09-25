@@ -16,7 +16,52 @@ content="width=device-width, initial-scale=1.0">
 *{
     box-sizing:border-box;
 }
+<script>
+async function downloadMonthlyPDF() {
 
+    const { jsPDF } = window.jspdf;
+
+    const pdf = new jsPDF();
+
+    pdf.setFontSize(18);
+    pdf.text("Moon Star Public High School Khanwahan", 105, 20, {
+        align: "center"
+    });
+
+    pdf.setFontSize(15);
+    pdf.text("Teacher Monthly Report", 105, 32, {
+        align: "center"
+    });
+
+    let y = 45;
+
+    const report = document.querySelector("#reports");
+
+    if (!report) {
+        alert("Monthly report nahi mili.");
+        return;
+    }
+
+    const text = report.innerText.split("\n");
+
+    pdf.setFontSize(11);
+
+    text.forEach(line => {
+
+        if (y > 280) {
+            pdf.addPage();
+            y = 20;
+        }
+
+        if (line.trim() !== "") {
+            pdf.text(line.trim().substring(0, 100), 15, y);
+            y += 7;
+        }
+    });
+
+    pdf.save("Teacher-Monthly-Report.pdf");
+}
+</script>
 body{
     margin:0;
     font-family:Arial,sans-serif;
