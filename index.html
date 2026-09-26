@@ -926,16 +926,50 @@ async function openFaceRegistration(){
 
     if(!currentUser){
 
-        alert(
-            "Pehle login karein."
-        );
-
+        alert("Pehle login karein.");
         return;
 
     }
 
-
+    // Dashboard completely hide
     document
+        .getElementById("dashboard")
+        .classList.add("hidden");
+
+    // Attendance hide
+    document
+        .getElementById("attendanceBox")
+        .classList.add("hidden");
+
+    // Monthly Report hide
+    document
+        .getElementById("monthlyReportBox")
+        .classList.add("hidden");
+
+    // History hide
+    document
+        .getElementById("history")
+        .innerHTML = "";
+
+    // Face Registration ONLY show
+    document
+        .getElementById("faceRegistrationBox")
+        .classList.remove("hidden");
+
+    // Register button disabled until camera + face API ready
+    document
+        .getElementById("registerFaceButton")
+        .disabled = true;
+
+    setStatus(
+        "📷 Camera start ho rahi hai..."
+    );
+
+    await startRegistrationCamera();
+
+}
+
+   document
         .getElementById("dashboard")
         .classList.add("hidden");
 
