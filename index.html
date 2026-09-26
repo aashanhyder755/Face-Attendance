@@ -7,6 +7,7 @@
 <title>Teachers Face Attendance</title>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
@@ -51,13 +52,15 @@ h2{
     margin-bottom:20px;
 }
 
-input{
+input,
+select{
     width:100%;
     padding:14px;
     border:1px solid #bbb;
     border-radius:10px;
     font-size:16px;
     margin:10px 0;
+    background:white;
 }
 
 button{
@@ -137,10 +140,59 @@ video{
     color:#666;
     text-align:center;
 }
+
+
+/* =====================================================
+   MONTHLY REPORT FORM
+===================================================== */
+
+.report-form{
+    margin-top:15px;
+}
+
+.report-form label{
+    display:block;
+    font-weight:bold;
+    margin-top:12px;
+    color:#174ea6;
+}
+
+.report-form h3{
+    background:#e8f1ff;
+    padding:11px;
+    border-radius:8px;
+    color:#174ea6;
+    margin-top:20px;
+    margin-bottom:8px;
+}
+
+.report-form .subject-note{
+    font-size:13px;
+    color:#666;
+    margin-bottom:5px;
+}
+
+
+/* =====================================================
+   SUBMIT MESSAGE
+===================================================== */
+
+.report-success{
+    text-align:center;
+    background:#e8f5e9;
+    color:#16803c;
+    padding:12px;
+    border-radius:10px;
+    font-weight:bold;
+    margin-top:15px;
+}
+
 </style>
+
 
 <!-- Face API -->
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+
 
 <!-- Firebase -->
 <script type="module">
@@ -162,7 +214,7 @@ import {
 
 /* =====================================================
    FIREBASE CONFIG
-   ===================================================== */
+===================================================== */
 
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
@@ -179,7 +231,7 @@ const db = getFirestore(app);
 
 /* =====================================================
    GLOBAL VARIABLES
-   ===================================================== */
+===================================================== */
 
 let teacherName = "";
 let videoStream = null;
@@ -189,7 +241,7 @@ let modelsLoaded = false;
 
 /* =====================================================
    MAKE FUNCTIONS AVAILABLE TO HTML BUTTONS
-   ===================================================== */
+===================================================== */
 
 window.startApp = startApp;
 window.openFaceRegistration = openFaceRegistration;
@@ -200,21 +252,28 @@ window.startCamera = startCamera;
 window.registerFace = registerFace;
 window.markAttendance = markAttendance;
 window.stopCamera = stopCamera;
+window.startAttendanceCamera = startAttendanceCamera;
+window.saveMonthlyReport = saveMonthlyReport;
 
 
 /* =====================================================
    APP START
-   ===================================================== */
+===================================================== */
 
 function startApp(){
 
     const nameInput =
         document.getElementById("teacherName");
 
-    const name = nameInput.value.trim();
+    const name =
+        nameInput.value.trim();
 
     if(!name){
-        alert("Please enter Teacher Name.");
+
+        alert(
+            "Please enter Teacher Name."
+        );
+
         return;
     }
 
@@ -227,14 +286,15 @@ function startApp(){
         .classList.remove("hidden");
 
     document.getElementById("welcomeName")
-        .innerText = "Welcome " + teacherName;
+        .innerText =
+        "Welcome " + teacherName;
 
 }
 
 
 /* =====================================================
    FACE REGISTRATION PAGE
-   ===================================================== */
+===================================================== */
 
 async function openFaceRegistration(){
 
@@ -244,7 +304,8 @@ async function openFaceRegistration(){
         .classList.remove("hidden");
 
     document.getElementById("registrationTeacher")
-        .innerText = teacherName;
+        .innerText =
+        teacherName;
 
     await loadFaceModels();
 
@@ -253,7 +314,7 @@ async function openFaceRegistration(){
 
 /* =====================================================
    ATTENDANCE PAGE
-   ===================================================== */
+===================================================== */
 
 async function openAttendance(){
 
@@ -263,7 +324,8 @@ async function openAttendance(){
         .classList.remove("hidden");
 
     document.getElementById("attendanceTeacher")
-        .innerText = teacherName;
+        .innerText =
+        teacherName;
 
     document.getElementById("attendanceStatus")
         .innerText = "";
@@ -274,8 +336,8 @@ async function openAttendance(){
 
 
 /* =====================================================
-   MONTHLY REPORT
-   ===================================================== */
+   MONTHLY REPORT PAGE
+===================================================== */
 
 async function openMonthlyReport(){
 
@@ -285,7 +347,8 @@ async function openMonthlyReport(){
         .classList.remove("hidden");
 
     document.getElementById("reportTeacher")
-        .innerText = teacherName;
+        .innerText =
+        teacherName;
 
     await loadMonthlyReport();
 
@@ -294,7 +357,7 @@ async function openMonthlyReport(){
 
 /* =====================================================
    BACK DASHBOARD
-   ===================================================== */
+===================================================== */
 
 function backDashboard(){
 
@@ -310,7 +373,7 @@ function backDashboard(){
 
 /* =====================================================
    HIDE ALL PAGES
-   ===================================================== */
+===================================================== */
 
 function hideAllPages(){
 
@@ -331,36 +394,47 @@ function hideAllPages(){
 
 /* =====================================================
    FACE API MODELS
-   ===================================================== */
+===================================================== */
 
 async function loadFaceModels(){
 
     if(modelsLoaded){
+
         return;
+
     }
 
     try{
 
-        document.getElementById("faceStatus").innerText =
-            "Loading face system...";
+        const faceStatus =
+            document.getElementById("faceStatus");
+
+        if(faceStatus){
+
+            faceStatus.innerText =
+                "Loading face system...";
+
+        }
 
         const MODEL_URL =
             "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
 
-        await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+        await faceapi.nets.tinyFaceDetector
+            .loadFromUri(MODEL_URL);
 
-        await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceLandmark68Net
+            .loadFromUri(MODEL_URL);
 
-        await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+        await faceapi.nets.faceRecognitionNet
+            .loadFromUri(MODEL_URL);
 
         modelsLoaded = true;
 
-        const status =
-            document.getElementById("faceStatus");
+        if(faceStatus){
 
-        if(status){
-            status.innerText =
+            faceStatus.innerText =
                 "Face system ready.";
+
         }
 
     }catch(error){
@@ -378,7 +452,7 @@ async function loadFaceModels(){
 
 /* =====================================================
    CAMERA START
-   ===================================================== */
+===================================================== */
 
 async function startCamera(){
 
@@ -402,7 +476,8 @@ async function startCamera(){
 
             });
 
-        video.srcObject = videoStream;
+        video.srcObject =
+            videoStream;
 
         await video.play();
 
@@ -429,15 +504,17 @@ async function startCamera(){
 
 /* =====================================================
    STOP CAMERA
-   ===================================================== */
+===================================================== */
 
 function stopCamera(){
 
     if(videoStream){
 
-        videoStream.getTracks().forEach(
-            track => track.stop()
-        );
+        videoStream
+            .getTracks()
+            .forEach(
+                track => track.stop()
+            );
 
         videoStream = null;
 
@@ -447,7 +524,9 @@ function stopCamera(){
         document.getElementById("video");
 
     if(video){
+
         video.srcObject = null;
+
     }
 
 }
@@ -455,7 +534,7 @@ function stopCamera(){
 
 /* =====================================================
    FACE DETECTION
-   ===================================================== */
+===================================================== */
 
 async function getFaceDescriptor(){
 
@@ -464,7 +543,9 @@ async function getFaceDescriptor(){
 
     if(!videoStream){
 
-        alert("Pehle Start Camera dabayein.");
+        alert(
+            "Pehle Start Camera dabayein."
+        );
 
         return null;
 
@@ -480,17 +561,22 @@ async function getFaceDescriptor(){
         .innerText =
         "Face detection start...";
 
+
     const detection =
         await faceapi
         .detectSingleFace(
             video,
             new faceapi.TinyFaceDetectorOptions({
+
                 inputSize:320,
+
                 scoreThreshold:0.5
+
             })
         )
         .withFaceLandmarks()
         .withFaceDescriptor();
+
 
     if(!detection){
 
@@ -502,9 +588,11 @@ async function getFaceDescriptor(){
 
     }
 
+
     document.getElementById("faceStatus")
         .innerText =
         "✅ Face detected.";
+
 
     return Array.from(
         detection.descriptor
@@ -515,24 +603,31 @@ async function getFaceDescriptor(){
 
 /* =====================================================
    REGISTER FACE
-   ===================================================== */
+===================================================== */
 
 async function registerFace(){
 
     if(!teacherName){
 
-        alert("Teacher name missing hai.");
+        alert(
+            "Teacher name missing hai."
+        );
 
         return;
 
     }
+
 
     const descriptor =
         await getFaceDescriptor();
 
+
     if(!descriptor){
+
         return;
+
     }
+
 
     try{
 
@@ -541,15 +636,16 @@ async function registerFace(){
             "Face Firebase mein save ho raha hai...";
 
 
-        /*
-         Check whether teacher already has face
-        */
-
         const q =
             query(
                 collection(db,"teacherFaces"),
-                where("name","==",teacherName)
+                where(
+                    "name",
+                    "==",
+                    teacherName
+                )
             );
+
 
         const snapshot =
             await getDocs(q);
@@ -590,6 +686,7 @@ async function registerFace(){
             .innerText =
             "✅ Face Firebase mein successfully registered ho gaya.";
 
+
         alert(
             "Face registration successful!"
         );
@@ -614,31 +711,42 @@ async function registerFace(){
 
 /* =====================================================
    GET REGISTERED FACE
-   ===================================================== */
+===================================================== */
 
 async function getRegisteredFace(){
 
     const q =
         query(
             collection(db,"teacherFaces"),
-            where("name","==",teacherName)
+            where(
+                "name",
+                "==",
+                teacherName
+            )
         );
+
 
     const snapshot =
         await getDocs(q);
 
+
     if(snapshot.empty){
+
         return null;
+
     }
 
-    return snapshot.docs[0].data().descriptor;
+
+    return snapshot.docs[0]
+        .data()
+        .descriptor;
 
 }
 
 
 /* =====================================================
    FACE MATCH
-   ===================================================== */
+===================================================== */
 
 function faceMatch(
     descriptor1,
@@ -651,10 +759,12 @@ function faceMatch(
             descriptor2
         );
 
+
     console.log(
         "Face distance:",
         distance
     );
+
 
     return distance < 0.55;
 
@@ -663,17 +773,12 @@ function faceMatch(
 
 /* =====================================================
    SCHOOL LOCATION CHECK
-   ===================================================== */
-
-/*
-   Yahan school ki latitude / longitude set karein.
-   Agar location checking temporarily nahi chahiye
-   to LOCATION_CHECK ko false kar dein.
-*/
+===================================================== */
 
 const LOCATION_CHECK = false;
 
 const SCHOOL_LATITUDE = 0;
+
 const SCHOOL_LONGITUDE = 0;
 
 const SCHOOL_RADIUS_METERS = 200;
@@ -702,6 +807,7 @@ function getDistance(
         (lon2-lon1) *
         Math.PI / 180;
 
+
     const a =
         Math.sin(dLat/2) *
         Math.sin(dLat/2) +
@@ -711,12 +817,14 @@ function getDistance(
         Math.sin(dLon/2) *
         Math.sin(dLon/2);
 
+
     const c =
         2 *
         Math.atan2(
             Math.sqrt(a),
             Math.sqrt(1-a)
         );
+
 
     return R*c;
 
@@ -729,9 +837,13 @@ function checkSchoolLocation(){
         resolve => {
 
             if(!LOCATION_CHECK){
+
                 resolve(true);
+
                 return;
+
             }
+
 
             if(!navigator.geolocation){
 
@@ -740,9 +852,11 @@ function checkSchoolLocation(){
                 );
 
                 resolve(false);
+
                 return;
 
             }
+
 
             navigator.geolocation.getCurrentPosition(
 
@@ -756,10 +870,12 @@ function checkSchoolLocation(){
                             SCHOOL_LONGITUDE
                         );
 
+
                     console.log(
                         "School distance:",
                         distance
                     );
+
 
                     if(
                         distance <=
@@ -806,24 +922,38 @@ function checkSchoolLocation(){
 
 /* =====================================================
    CHECK TODAY DUPLICATE
-   ===================================================== */
+===================================================== */
 
 async function alreadyMarkedToday(){
 
     const today =
-        new Date().toLocaleDateString(
+        new Date()
+        .toLocaleDateString(
             "en-GB"
         );
+
 
     const q =
         query(
             collection(db,"attendance"),
-            where("name","==",teacherName),
-            where("date","==",today)
+
+            where(
+                "name",
+                "==",
+                teacherName
+            ),
+
+            where(
+                "date",
+                "==",
+                today
+            )
         );
+
 
     const snapshot =
         await getDocs(q);
+
 
     return !snapshot.empty;
 
@@ -832,17 +962,20 @@ async function alreadyMarkedToday(){
 
 /* =====================================================
    MARK ATTENDANCE
-   ===================================================== */
+===================================================== */
 
 async function markAttendance(){
 
     if(!teacherName){
 
-        alert("Teacher name missing hai.");
+        alert(
+            "Teacher name missing hai."
+        );
 
         return;
 
     }
+
 
     try{
 
@@ -851,16 +984,14 @@ async function markAttendance(){
                 "attendanceStatus"
             );
 
+
         status.innerText =
             "Face match ho raha hai...";
 
 
-        /*
-         First duplicate check
-        */
-
         const duplicate =
             await alreadyMarkedToday();
+
 
         if(duplicate){
 
@@ -876,12 +1007,9 @@ async function markAttendance(){
         }
 
 
-        /*
-         School location
-        */
-
         const locationOK =
             await checkSchoolLocation();
+
 
         if(!locationOK){
 
@@ -893,12 +1021,9 @@ async function markAttendance(){
         }
 
 
-        /*
-         Registered face
-        */
-
         const registered =
             await getRegisteredFace();
+
 
         if(!registered){
 
@@ -914,12 +1039,9 @@ async function markAttendance(){
         }
 
 
-        /*
-         Camera face
-        */
-
         const currentDescriptor =
             await getFaceDescriptor();
+
 
         if(!currentDescriptor){
 
@@ -930,10 +1052,6 @@ async function markAttendance(){
 
         }
 
-
-        /*
-         Face matching
-        */
 
         const matched =
             faceMatch(
@@ -956,17 +1074,15 @@ async function markAttendance(){
         }
 
 
-        /*
-         Save attendance
-        */
-
         const now =
             new Date();
+
 
         const date =
             now.toLocaleDateString(
                 "en-GB"
             );
+
 
         const time =
             now.toLocaleTimeString(
@@ -989,6 +1105,7 @@ async function markAttendance(){
         status.innerText =
             "☁️ Firebase mein attendance save ho gayi.";
 
+
         alert(
             "✅ Attendance successfully marked!"
         );
@@ -1003,6 +1120,7 @@ async function markAttendance(){
         ).innerText =
             "❌ Attendance error.";
 
+
         alert(
             "Attendance save nahi ho saki."
         );
@@ -1013,149 +1131,427 @@ async function markAttendance(){
 
 
 /* =====================================================
-   MONTHLY REPORT
-   ===================================================== */
+   MONTHLY REPORT FORM
+===================================================== */
 
 async function loadMonthlyReport(){
 
-    const report =
+    document.getElementById(
+        "reportTeacher"
+    ).innerText =
+        teacherName;
+
+
+    document.getElementById(
+        "monthlyRecords"
+    ).innerHTML = `
+
+        <div class="report-form">
+
+            <label>
+                Teacher Name
+            </label>
+
+            <input
+                type="text"
+                id="monthlyTeacherName"
+                value="${teacherName}"
+                readonly
+            >
+
+
+            <label>
+                Month
+            </label>
+
+            <select id="reportMonth">
+
+                <option value="">
+                    Select Month
+                </option>
+
+                <option>January</option>
+
+                <option>February</option>
+
+                <option>March</option>
+
+                <option>April</option>
+
+                <option>May</option>
+
+                <option>June</option>
+
+                <option>July</option>
+
+                <option>August</option>
+
+                <option>September</option>
+
+                <option>October</option>
+
+                <option>November</option>
+
+                <option>December</option>
+
+            </select>
+
+
+            <label>
+                Class
+            </label>
+
+            <input
+                type="text"
+                id="reportClass"
+                placeholder="Class"
+            >
+
+
+            <h3>
+                English
+            </h3>
+
+            ${subjectFields("english")}
+
+
+            <h3>
+                Urdu
+            </h3>
+
+            ${subjectFields("urdu")}
+
+
+            <h3>
+                Math
+            </h3>
+
+            ${subjectFields("math")}
+
+
+            <h3>
+                Sindhi
+            </h3>
+
+            ${subjectFields("sindhi")}
+
+
+            <h3>
+                S.S.
+            </h3>
+
+            ${subjectFields("ss")}
+
+
+            <button
+                class="green"
+                onclick="saveMonthlyReport()"
+            >
+                💾 Submit Report
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =====================================================
+   SUBJECT FIELDS
+===================================================== */
+
+function subjectFields(prefix){
+
+    return `
+
+        <div class="subject-note">
+            Enter subject details
+        </div>
+
+
+        <input
+            type="number"
+            id="${prefix}Total"
+            placeholder="Total"
+            min="0"
+        >
+
+
+        <input
+            type="number"
+            id="${prefix}Read"
+            placeholder="Read"
+            min="0"
+        >
+
+
+        <input
+            type="number"
+            id="${prefix}Write"
+            placeholder="Write"
+            min="0"
+        >
+
+
+        <input
+            type="number"
+            id="${prefix}Checked"
+            placeholder="Checked"
+            min="0"
+        >
+
+
+        <input
+            type="number"
+            id="${prefix}Unchecked"
+            placeholder="Unchecked"
+            min="0"
+        >
+
+    `;
+
+}
+
+
+/* =====================================================
+   SUBMIT MONTHLY REPORT
+===================================================== */
+
+async function saveMonthlyReport(){
+
+    const month =
         document.getElementById(
-            "monthlyRecords"
+            "reportMonth"
+        ).value;
+
+
+    const reportClass =
+        document.getElementById(
+            "reportClass"
+        ).value.trim();
+
+
+    if(!month){
+
+        alert(
+            "Please select Month."
         );
 
-    report.innerHTML =
-        "Loading report...";
+        return;
+
+    }
+
+
+    if(!reportClass){
+
+        alert(
+            "Please enter Class."
+        );
+
+        return;
+
+    }
+
+
+    const reportData = {
+
+        teacherName:
+            teacherName,
+
+        month:
+            month,
+
+        className:
+            reportClass,
+
+
+        English:{
+
+            total:
+                document.getElementById(
+                    "englishTotal"
+                ).value,
+
+            read:
+                document.getElementById(
+                    "englishRead"
+                ).value,
+
+            write:
+                document.getElementById(
+                    "englishWrite"
+                ).value,
+
+            checked:
+                document.getElementById(
+                    "englishChecked"
+                ).value,
+
+            unchecked:
+                document.getElementById(
+                    "englishUnchecked"
+                ).value
+
+        },
+
+
+        Urdu:{
+
+            total:
+                document.getElementById(
+                    "urduTotal"
+                ).value,
+
+            read:
+                document.getElementById(
+                    "urduRead"
+                ).value,
+
+            write:
+                document.getElementById(
+                    "urduWrite"
+                ).value,
+
+            checked:
+                document.getElementById(
+                    "urduChecked"
+                ).value,
+
+            unchecked:
+                document.getElementById(
+                    "urduUnchecked"
+                ).value
+
+        },
+
+
+        Math:{
+
+            total:
+                document.getElementById(
+                    "mathTotal"
+                ).value,
+
+            read:
+                document.getElementById(
+                    "mathRead"
+                ).value,
+
+            write:
+                document.getElementById(
+                    "mathWrite"
+                ).value,
+
+            checked:
+                document.getElementById(
+                    "mathChecked"
+                ).value,
+
+            unchecked:
+                document.getElementById(
+                    "mathUnchecked"
+                ).value
+
+        },
+
+
+        Sindhi:{
+
+            total:
+                document.getElementById(
+                    "sindhiTotal"
+                ).value,
+
+            read:
+                document.getElementById(
+                    "sindhiRead"
+                ).value,
+
+            write:
+                document.getElementById(
+                    "sindhiWrite"
+                ).value,
+
+            checked:
+                document.getElementById(
+                    "sindhiChecked"
+                ).value,
+
+            unchecked:
+                document.getElementById(
+                    "sindhiUnchecked"
+                ).value
+
+        },
+
+
+        SS:{
+
+            total:
+                document.getElementById(
+                    "ssTotal"
+                ).value,
+
+            read:
+                document.getElementById(
+                    "ssRead"
+                ).value,
+
+            write:
+                document.getElementById(
+                    "ssWrite"
+                ).value,
+
+            checked:
+                document.getElementById(
+                    "ssChecked"
+                ).value,
+
+            unchecked:
+                document.getElementById(
+                    "ssUnchecked"
+                ).value
+
+        },
+
+
+        createdAt:
+            serverTimestamp()
+
+    };
+
 
     try{
 
-        const q =
-            query(
-                collection(db,"attendance"),
-                where("name","==",teacherName)
-            );
-
-        const snapshot =
-            await getDocs(q);
-
-        if(snapshot.empty){
-
-            report.innerHTML =
-                "<p>No attendance record found.</p>";
-
-            return;
-
-        }
-
-
-        const currentMonth =
-            new Date().getMonth();
-
-        const currentYear =
-            new Date().getFullYear();
-
-
-        let records = [];
-
-
-        snapshot.forEach(
-            doc => {
-
-                const data =
-                    doc.data();
-
-                if(!data.date){
-                    return;
-                }
-
-                const parts =
-                    data.date.split("/");
-
-                if(parts.length !== 3){
-                    return;
-                }
-
-                const day =
-                    parseInt(parts[0]);
-
-                const month =
-                    parseInt(parts[1])-1;
-
-                const year =
-                    parseInt(parts[2]);
-
-
-                if(
-                    month === currentMonth &&
-                    year === currentYear
-                ){
-
-                    records.push(data);
-
-                }
-
-            }
+        await addDoc(
+            collection(
+                db,
+                "monthlyReports"
+            ),
+            reportData
         );
 
 
-        records.sort(
-            (a,b) =>
-                (a.date + a.time)
-                .localeCompare(
-                    b.date + b.time
-                )
+        alert(
+            "✅ Monthly Report successfully submitted."
         );
 
 
-        let html = "";
+        /*
+           Form ko dobara fresh kar dete hain.
+        */
 
-        html +=
-            "<h3>Monthly Attendance</h3>";
-
-        html +=
-            "<p><b>Teacher:</b> " +
-            teacherName +
-            "</p>";
-
-        html +=
-            "<p><b>Total Present:</b> " +
-            records.length +
-            "</p>";
-
-
-        records.forEach(
-            record => {
-
-                html += `
-                    <div class="record">
-                        <b>${record.name}</b><br>
-                        Status: ${record.status}<br>
-                        Date: ${record.date}<br>
-                        Time: ${record.time}
-                    </div>
-                `;
-
-            }
-        );
-
-
-        if(records.length === 0){
-
-            html +=
-                "<p>No attendance found for this month.</p>";
-
-        }
-
-
-        report.innerHTML =
-            html;
+        await loadMonthlyReport();
 
 
     }catch(error){
 
         console.error(error);
 
-        report.innerHTML =
-            "❌ Monthly report load nahi ho saki.";
+        alert(
+            "❌ Monthly Report submit nahi ho saki."
+        );
 
     }
 
@@ -1179,13 +1575,20 @@ async function loadMonthlyReport(){
     class="card"
 >
 
-    <h1>👨‍🏫 Teachers Face Attendance</h1>
+    <h1>
+        👨‍🏫 Teachers Face Attendance
+    </h1>
+
 
     <div class="school">
         Moon Star Public High School Khanwahan
     </div>
 
-    <h2>Teacher Name</h2>
+
+    <h2>
+        Teacher Name
+    </h2>
+
 
     <input
         type="text"
@@ -1194,11 +1597,13 @@ async function loadMonthlyReport(){
         autocomplete="off"
     >
 
+
     <button
         onclick="startApp()"
     >
         Continue
     </button>
+
 
     <p class="small">
         Teacher name enter karke dashboard open karein.
@@ -1216,12 +1621,16 @@ async function loadMonthlyReport(){
     class="card hidden"
 >
 
-    <h1>👨‍🏫 Teachers Face Attendance</h1>
+    <h1>
+        👨‍🏫 Teachers Face Attendance
+    </h1>
+
 
     <div
         id="welcomeName"
         class="welcome"
     ></div>
+
 
     <button
         class="green"
@@ -1230,11 +1639,13 @@ async function loadMonthlyReport(){
         👤 Face Registration
     </button>
 
+
     <button
         onclick="openAttendance()"
     >
         📷 Mark Attendance
     </button>
+
 
     <button
         class="orange"
@@ -1255,16 +1666,23 @@ async function loadMonthlyReport(){
     class="card hidden"
 >
 
-    <h1>👤 Face Registration</h1>
+    <h1>
+        👤 Face Registration
+    </h1>
+
 
     <p class="welcome">
+
         Teacher:
         <b id="registrationTeacher"></b>
+
     </p>
+
 
     <p class="welcome">
         Apna face camera ke samne rakhein.
     </p>
+
 
     <video
         id="video"
@@ -1273,6 +1691,7 @@ async function loadMonthlyReport(){
         playsinline
     ></video>
 
+
     <div
         id="faceStatus"
         class="status"
@@ -1280,11 +1699,13 @@ async function loadMonthlyReport(){
         Camera start karein.
     </div>
 
+
     <button
         onclick="startCamera()"
     >
         📷 Start Camera
     </button>
+
 
     <button
         class="green"
@@ -1292,6 +1713,7 @@ async function loadMonthlyReport(){
     >
         👤 Register My Face
     </button>
+
 
     <button
         class="gray"
@@ -1312,12 +1734,18 @@ async function loadMonthlyReport(){
     class="card hidden"
 >
 
-    <h1>📷 Mark Attendance</h1>
+    <h1>
+        📷 Mark Attendance
+    </h1>
+
 
     <p class="welcome">
+
         Teacher:
         <b id="attendanceTeacher"></b>
+
     </p>
+
 
     <video
         id="videoAttendance"
@@ -1326,10 +1754,12 @@ async function loadMonthlyReport(){
         playsinline
     ></video>
 
+
     <div
         id="attendanceStatus"
         class="status"
     ></div>
+
 
     <button
         onclick="startAttendanceCamera()"
@@ -1337,12 +1767,14 @@ async function loadMonthlyReport(){
         📷 Start Camera
     </button>
 
+
     <button
         class="green"
         onclick="markAttendance()"
     >
         ✅ Mark Attendance
     </button>
+
 
     <button
         class="gray"
@@ -1363,14 +1795,23 @@ async function loadMonthlyReport(){
     class="card hidden"
 >
 
-    <h1>📊 Monthly Report</h1>
+    <h1>
+        📊 Monthly Report
+    </h1>
+
 
     <p class="welcome">
+
         Teacher:
         <b id="reportTeacher"></b>
+
     </p>
 
-    <div id="monthlyRecords"></div>
+
+    <div
+        id="monthlyRecords"
+    ></div>
+
 
     <button
         class="gray"
@@ -1400,18 +1841,22 @@ async function startAttendanceCamera(){
             videoStream
                 .getTracks()
                 .forEach(
-                    track => track.stop()
+                    track =>
+                        track.stop()
                 );
 
         }
+
 
         const video =
             document.getElementById(
                 "videoAttendance"
             );
 
+
         videoStream =
-            await navigator.mediaDevices.getUserMedia({
+            await navigator.mediaDevices
+            .getUserMedia({
 
                 video:{
                     facingMode:"user",
@@ -1423,15 +1868,19 @@ async function startAttendanceCamera(){
 
             });
 
+
         video.srcObject =
             videoStream;
 
+
         await video.play();
+
 
         document.getElementById(
             "attendanceStatus"
         ).innerText =
             "Camera ready. Face camera ke samne rakhein.";
+
 
         /*
          Face detection ke liye
@@ -1443,9 +1892,11 @@ async function startAttendanceCamera(){
         ).srcObject =
             videoStream;
 
+
     }catch(error){
 
         console.error(error);
+
 
         document.getElementById(
             "attendanceStatus"
@@ -1457,6 +1908,7 @@ async function startAttendanceCamera(){
 }
 
 </script>
+
 
 </body>
 </html>
