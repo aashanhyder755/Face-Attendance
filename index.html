@@ -117,7 +117,7 @@ video{
      LOGIN PAGE
 ================================================== -->
 
-<div id="loginPage" class="card">
+<div id="loginPage" class="card hidden">
 
     <h1>👨‍🏫 Teacher Login</h1>
 
@@ -330,13 +330,6 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-/*
-==================================================
-APNE CURRENT WORKING FIREBASE CONFIG KI VALUES
-YAHAN RAKHEIN
-==================================================
-*/
-
 const firebaseConfig = {
 
     apiKey: "YOUR_API_KEY",
@@ -442,10 +435,6 @@ window.login = function(){
     }
 
 
-    /*
-    Current simple login.
-    */
-
     currentUser = "Ashfaque";
 
 
@@ -473,8 +462,6 @@ window.login = function(){
 
 /* ==================================================
    FACE REGISTRATION DIRECT
-   IMPORTANT:
-   YAHAN KOI LOGIN CHECK NAHI
 ================================================== */
 
 window.openFaceRegistrationDirect =
@@ -496,8 +483,6 @@ function(){
 
 /* ==================================================
    MARK ATTENDANCE DIRECT
-   IMPORTANT:
-   YAHAN KOI LOGIN CHECK NAHI
 ================================================== */
 
 window.openMarkAttendanceDirect =
@@ -519,8 +504,6 @@ function(){
 
 /* ==================================================
    OLD BUTTON COMPATIBILITY
-   IMPORTANT:
-   ISME BHI LOGIN CHECK NAHI
 ================================================== */
 
 window.openPage =
@@ -690,7 +673,6 @@ function stopAllCameras(){
 
 /* ==================================================
    REGISTRATION CAMERA
-   NO LOGIN CHECK
 ================================================== */
 
 window.startRegistrationCamera =
@@ -766,7 +748,6 @@ async function(){
 
 /* ==================================================
    REGISTER FACE
-   NO LOGIN CHECK
 ================================================== */
 
 window.registerFace =
@@ -897,7 +878,6 @@ async function(){
 
 /* ==================================================
    ATTENDANCE CAMERA
-   NO LOGIN CHECK
 ================================================== */
 
 window.startAttendanceCamera =
@@ -1002,7 +982,6 @@ function faceDistance(a,b){
 
 /* ==================================================
    MARK ATTENDANCE
-   NO LOGIN CHECK
 ================================================== */
 
 window.markAttendance =
@@ -1150,11 +1129,6 @@ async function(){
             );
 
 
-        /*
-        Duplicate prevention:
-        Same teacher + same date
-        */
-
         const q =
             query(
                 collection(
@@ -1224,40 +1198,77 @@ async function(){
 
 
 /* ==================================================
-   PAGE START
+   PAGE START - UPDATED
 ================================================== */
 
 window.addEventListener(
     "load",
     function(){
 
-        const loggedIn =
-            localStorage.getItem(
-                "teacherLoggedIn"
-            );
-
-
         currentUser =
             localStorage.getItem(
                 "teacherName"
             ) || "";
 
+        const page =
+            window.location.hash;
 
-        if(loggedIn === "true"){
+
+        /*
+        Android Builder:
+        Face Registration
+        */
+
+        if(page === "#faceRegistration"){
+
+            showOnly(
+                "faceRegistration"
+            );
 
             document.getElementById(
-                "welcomeName"
+                "registrationStatus"
             ).innerText =
-                currentUser || "Teacher";
+                "Camera start karein.";
 
-            showOnly("menuPage");
-
-        }
-        else{
-
-            showOnly("loginPage");
+            return;
 
         }
+
+
+        /*
+        Android Builder:
+        Mark Attendance
+        */
+
+        if(page === "#markAttendance"){
+
+            showOnly(
+                "markAttendance"
+            );
+
+            document.getElementById(
+                "attendanceStatus"
+            ).innerText =
+                "Camera start karein.";
+
+            return;
+
+        }
+
+
+        /*
+        Normal website:
+        Teacher menu
+        */
+
+        document.getElementById(
+            "welcomeName"
+        ).innerText =
+            currentUser || "Teacher";
+
+        showOnly(
+            "menuPage"
+        );
 
     }
 );
