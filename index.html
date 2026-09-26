@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Teachers Face Attendance</title>
 
 <style>
+
 *{
     box-sizing:border-box;
 }
@@ -141,7 +143,21 @@ video{
     font-size:13px;
     color:#607080;
 }
+
+.record{
+    background:#f8fbff;
+    padding:14px;
+    border-radius:12px;
+    margin:10px 0;
+    border:1px solid #e3ebf3;
+}
+
+.record strong{
+    color:#1769aa;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -149,6 +165,7 @@ video{
 <div class="container">
 
 <h1>👨‍🏫 Teachers Face Attendance</h1>
+
 
 <!-- ================= LOGIN ================= -->
 
@@ -168,47 +185,12 @@ video{
             type="password"
             placeholder="Password">
 
-        <button id="loginButton" onclick="login()">
+        <button
+            id="loginButton"
+            onclick="login()">
+
             🔐 Login
-        </button>
 
-        <button onclick="showSignup()">
-            Create New Account
-        </button>
-
-    </div>
-
-
-    <div id="signupBox" class="hidden">
-
-        <h2>📝 Teacher Signup</h2>
-
-        <input
-            id="signupName"
-            type="text"
-            placeholder="Teacher Name">
-
-        <input
-            id="signupEmail"
-            type="email"
-            placeholder="Email">
-
-        <input
-            id="signupPassword"
-            type="password"
-            placeholder="Password">
-
-        <input
-            id="signupConfirm"
-            type="password"
-            placeholder="Confirm Password">
-
-        <button onclick="signup()">
-            📝 Create Account
-        </button>
-
-        <button class="back" onclick="showLogin()">
-            ← Back to Login
         </button>
 
     </div>
@@ -243,8 +225,12 @@ video{
             📋 My Attendance History
         </button>
 
-        <button class="logout" onclick="logout()">
+        <button
+            class="logout"
+            onclick="logout()">
+
             🚪 Logout
+
         </button>
 
     </div>
@@ -252,7 +238,9 @@ video{
 
     <!-- ================= FACE REGISTRATION ================= -->
 
-    <div id="faceRegistrationBox" class="hidden">
+    <div
+        id="faceRegistrationBox"
+        class="hidden">
 
         <h2>👤 Face Registration</h2>
 
@@ -274,18 +262,26 @@ video{
         <button
             id="registrationCameraButton"
             onclick="startRegistrationCamera()">
+
             📷 Start Camera
+
         </button>
 
         <button
             id="registerFaceButton"
             onclick="registerFace()"
             disabled>
+
             👤 Register My Face
+
         </button>
 
-        <button class="back" onclick="backToDashboard()">
+        <button
+            class="back"
+            onclick="backToDashboard()">
+
             ← Back
+
         </button>
 
     </div>
@@ -293,7 +289,9 @@ video{
 
     <!-- ================= MARK ATTENDANCE ================= -->
 
-    <div id="attendanceBox" class="hidden">
+    <div
+        id="attendanceBox"
+        class="hidden">
 
         <h2>📋 Mark Attendance</h2>
 
@@ -316,11 +314,17 @@ video{
             id="attendanceButton"
             onclick="checkFace()"
             disabled>
+
             📋 Mark Attendance
+
         </button>
 
-        <button class="back" onclick="backToDashboard()">
+        <button
+            class="back"
+            onclick="backToDashboard()">
+
             ← Back
+
         </button>
 
     </div>
@@ -328,7 +332,9 @@ video{
 
     <!-- ================= MONTHLY REPORT ================= -->
 
-    <div id="monthlyReportBox" class="hidden">
+    <div
+        id="monthlyReportBox"
+        class="hidden">
 
         <h2>📊 Teacher Monthly Report</h2>
 
@@ -352,6 +358,8 @@ video{
             placeholder="Class">
 
 
+        <!-- ENGLISH -->
+
         <div class="subject">
 
             <h3>English</h3>
@@ -364,6 +372,8 @@ video{
 
         </div>
 
+
+        <!-- URDU -->
 
         <div class="subject">
 
@@ -378,6 +388,8 @@ video{
         </div>
 
 
+        <!-- MATH -->
+
         <div class="subject">
 
             <h3>Math</h3>
@@ -390,6 +402,8 @@ video{
 
         </div>
 
+
+        <!-- SINDHI -->
 
         <div class="subject">
 
@@ -404,6 +418,8 @@ video{
         </div>
 
 
+        <!-- SS -->
+
         <div class="subject">
 
             <h3>S.S.</h3>
@@ -417,6 +433,8 @@ video{
         </div>
 
 
+        <!-- ISLAMIAT -->
+
         <div class="subject">
 
             <h3>Islamiat</h3>
@@ -429,6 +447,8 @@ video{
 
         </div>
 
+
+        <!-- SCIENCE -->
 
         <div class="subject">
 
@@ -450,11 +470,18 @@ video{
 
 
         <button onclick="submitMonthlyReport()">
+
             ☁️ Submit Monthly Report
+
         </button>
 
-        <button class="back" onclick="backToDashboard()">
+
+        <button
+            class="back"
+            onclick="backToDashboard()">
+
             ← Back
+
         </button>
 
     </div>
@@ -463,16 +490,23 @@ video{
 
 
 <div id="status">
+
     Login karein.
+
 </div>
 
 
 <div id="history"></div>
 
 
-<script type="module">
+<!-- FACE API -->
 
-/* ================= FIREBASE ================= */
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+
+
+<!-- ================= FIREBASE ================= -->
+
+<script type="module">
 
 import {
     initializeApp
@@ -480,11 +514,9 @@ import {
 
 import {
     getAuth,
-    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     onAuthStateChanged,
-    signOut,
-    updateProfile
+    signOut
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
 import {
@@ -494,37 +526,50 @@ import {
     getDocs,
     doc,
     getDoc,
-    setDoc,
     query,
     where,
     limit
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
+/* ================= FIREBASE CONFIG ================= */
+
 const firebaseConfig = {
 
-    apiKey:"AIzaSyBguAzVWGP_NUyObdv2Fsreu8pvPycSgzE",
+    apiKey:
+        "AIzaSyBguAzVWGP_NUyObdv2Fsreu8pvPycSgzE",
 
-    authDomain:"teachers-face-attendance.firebaseapp.com",
+    authDomain:
+        "teachers-face-attendance.firebaseapp.com",
 
-    projectId:"teachers-face-attendance",
+    projectId:
+        "teachers-face-attendance",
 
-    storageBucket:"teachers-face-attendance.firebasestorage.app",
+    storageBucket:
+        "teachers-face-attendance.firebasestorage.app",
 
-    messagingSenderId:"63876838606",
+    messagingSenderId:
+        "63876838606",
 
-    appId:"1:63876838606:web:572e240079865aabbc4c9f",
+    appId:
+        "1:63876838606:web:572e240079865aabbc4c9f",
 
-    measurementId:"G-XN93NKWLY5"
+    measurementId:
+        "G-XN93NKWLY5"
 
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
 
-const db = getFirestore(app);
+const auth =
+    getAuth(app);
+
+
+const db =
+    getFirestore(app);
 
 
 /* ================= VARIABLES ================= */
@@ -553,158 +598,81 @@ function setStatus(message){
 }
 
 
-/* ================= LOGIN UI ================= */
+/* ================= DATE ================= */
 
-function showLogin(){
+function getDateKey(date){
 
-    document
-        .getElementById("signupBox")
-        .classList.add("hidden");
+    const year =
+        date.getFullYear();
 
-    document
-        .getElementById("loginBox")
-        .classList.remove("hidden");
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2,"0");
 
-    setStatus("Login karein.");
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2,"0");
 
-}
-
-
-function showSignup(){
-
-    document
-        .getElementById("loginBox")
-        .classList.add("hidden");
-
-    document
-        .getElementById("signupBox")
-        .classList.remove("hidden");
-
-    setStatus("Naya teacher account banayein.");
+    return (
+        year +
+        "-" +
+        month +
+        "-" +
+        day
+    );
 
 }
 
 
-/* ================= SIGNUP ================= */
+/* ================= TEACHER NAME ================= */
 
-async function signup(){
+async function getMyTeacherName(){
 
-    const name =
-        document
-        .getElementById("signupName")
-        .value
-        .trim();
+    if(!currentUser){
 
-    const email =
-        document
-        .getElementById("signupEmail")
-        .value
-        .trim();
+        return "";
 
-    const password =
-        document
-        .getElementById("signupPassword")
-        .value;
-
-    const confirm =
-        document
-        .getElementById("signupConfirm")
-        .value;
-
-
-    if(!name){
-
-        alert("Teacher Name likhein.");
-
-        return;
     }
 
 
-    if(!email){
+    if(currentUser.displayName){
 
-        alert("Email likhein.");
+        return currentUser.displayName;
 
-        return;
-    }
-
-
-    if(password.length < 6){
-
-        alert(
-            "Password kam az kam 6 characters ka hona chahiye."
-        );
-
-        return;
-    }
-
-
-    if(password !== confirm){
-
-        alert(
-            "Password same nahi hain."
-        );
-
-        return;
     }
 
 
     try{
 
-        setStatus(
-            "⏳ Account ban raha hai..."
-        );
-
-
-        const result =
-            await createUserWithEmailAndPassword(
-                auth,
-                email,
-                password
+        const accountDoc =
+            await getDoc(
+                doc(
+                    db,
+                    "teacherAccounts",
+                    currentUser.uid
+                )
             );
 
 
-        await updateProfile(
-            result.user,
-            {
-                displayName:name
-            }
-        );
+        if(accountDoc.exists()){
 
+            return (
+                accountDoc.data().name ||
+                ""
+            );
 
-        await setDoc(
-            doc(
-                db,
-                "teacherAccounts",
-                result.user.uid
-            ),
-            {
-                uid:result.user.uid,
-                name:name,
-                email:email,
-                createdAt:
-                    new Date().toISOString()
-            }
-        );
-
-
-        currentUser = result.user;
-
-        openTeacherApp();
-
+        }
 
     }catch(error){
 
         console.error(error);
 
-        alert(
-            error.message
-        );
-
-        setStatus(
-            "❌ Account nahi bana."
-        );
-
     }
+
+
+    return currentUser.email || "";
 
 }
 
@@ -730,6 +698,7 @@ async function login(){
         alert("Email likhein.");
 
         return;
+
     }
 
 
@@ -738,14 +707,18 @@ async function login(){
         alert("Password likhein.");
 
         return;
+
     }
 
 
     try{
 
-        document
-        .getElementById("loginButton")
-        .disabled = true;
+        const button =
+            document
+            .getElementById("loginButton");
+
+
+        button.disabled = true;
 
 
         setStatus(
@@ -768,9 +741,11 @@ async function login(){
             "Email ya password ghalat hai."
         );
 
+
         setStatus(
             "❌ Login failed."
         );
+
 
     }finally{
 
@@ -790,6 +765,7 @@ async function openTeacherApp(){
     if(!currentUser){
 
         return;
+
     }
 
 
@@ -806,38 +782,8 @@ async function openTeacherApp(){
     backToDashboard();
 
 
-    let name =
-        currentUser.displayName;
-
-
-    if(!name){
-
-        try{
-
-            const accountDoc =
-                await getDoc(
-                    doc(
-                        db,
-                        "teacherAccounts",
-                        currentUser.uid
-                    )
-                );
-
-
-            if(accountDoc.exists()){
-
-                name =
-                    accountDoc.data().name;
-
-            }
-
-        }catch(error){
-
-            console.error(error);
-
-        }
-
-    }
+    const name =
+        await getMyTeacherName();
 
 
     document
@@ -847,9 +793,100 @@ async function openTeacherApp(){
         (name || currentUser.email);
 
 
+    document
+        .getElementById("reportTeacherName")
+        .value =
+        name || currentUser.email;
+
+
     setStatus(
         "✅ Login successful."
     );
+
+}
+
+
+/* ================= AUTH STATE ================= */
+
+onAuthStateChanged(
+    auth,
+    async user => {
+
+        authReady = true;
+
+        currentUser = user || null;
+
+
+        if(user){
+
+            await openTeacherApp();
+
+        }else{
+
+            document
+                .getElementById("authSection")
+                .classList.remove("hidden");
+
+
+            document
+                .getElementById("appSection")
+                .classList.add("hidden");
+
+
+            setStatus(
+                "Login karein."
+            );
+
+        }
+
+    }
+);
+
+
+/* ================= LOGOUT ================= */
+
+async function logout(){
+
+    stopCameras();
+
+
+    try{
+
+        await signOut(auth);
+
+        currentUser = null;
+
+
+        document
+            .getElementById("authSection")
+            .classList.remove("hidden");
+
+
+        document
+            .getElementById("appSection")
+            .classList.add("hidden");
+
+
+        document
+            .getElementById("history")
+            .innerHTML = "";
+
+
+        setStatus(
+            "Login karein."
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+        alert(
+            "Logout error:\n" +
+            error.message
+        );
+
+    }
 
 }
 
@@ -894,6 +931,7 @@ async function openFaceRegistration(){
         );
 
         return;
+
     }
 
 
@@ -922,6 +960,8 @@ async function openFaceRegistration(){
 }
 
 
+/* ================= START REGISTRATION CAMERA ================= */
+
 async function startRegistrationCamera(){
 
     try{
@@ -939,6 +979,7 @@ async function startRegistrationCamera(){
             );
 
             return;
+
         }
 
 
@@ -946,6 +987,7 @@ async function startRegistrationCamera(){
             await navigator.mediaDevices.getUserMedia({
 
                 video:{
+
                     facingMode:{
                         ideal:"user"
                     },
@@ -967,7 +1009,9 @@ async function startRegistrationCamera(){
 
         const video =
             document
-            .getElementById("registrationCamera");
+            .getElementById(
+                "registrationCamera"
+            );
 
 
         video.srcObject =
@@ -985,8 +1029,11 @@ async function startRegistrationCamera(){
 
 
         document
-            .getElementById("registerFaceButton")
-            .disabled = !faceapiLoaded;
+            .getElementById(
+                "registerFaceButton"
+            )
+            .disabled =
+            !faceapiLoaded;
 
 
         if(faceapiLoaded){
@@ -1017,13 +1064,16 @@ async function startRegistrationCamera(){
 }
 
 
+/* ================= STOP REGISTRATION CAMERA ================= */
+
 function stopRegistrationCamera(){
 
     if(registrationStream){
 
         registrationStream
             .getTracks()
-            .forEach(track =>
+            .forEach(
+                track =>
                 track.stop()
             );
 
@@ -1045,6 +1095,7 @@ async function registerFace(){
         );
 
         return;
+
     }
 
 
@@ -1055,6 +1106,7 @@ async function registerFace(){
         );
 
         return;
+
     }
 
 
@@ -1065,14 +1117,20 @@ async function registerFace(){
         );
 
         return;
+
     }
 
 
     try{
 
-        document
-            .getElementById("registerFaceButton")
-            .disabled = true;
+        const button =
+            document
+            .getElementById(
+                "registerFaceButton"
+            );
+
+
+        button.disabled = true;
 
 
         setStatus(
@@ -1082,7 +1140,12 @@ async function registerFace(){
 
         const video =
             document
-            .getElementById("registrationCamera");
+            .getElementById(
+                "registrationCamera"
+            );
+
+
+        await waitForVideo(video);
 
 
         const detection =
@@ -1108,12 +1171,16 @@ async function registerFace(){
             );
 
             return;
+
         }
 
 
         const myFaceQuery =
             query(
-                collection(db,"teachers"),
+                collection(
+                    db,
+                    "teachers"
+                ),
                 where(
                     "uid",
                     "==",
@@ -1124,7 +1191,9 @@ async function registerFace(){
 
 
         const existing =
-            await getDocs(myFaceQuery);
+            await getDocs(
+                myFaceQuery
+            );
 
 
         if(!existing.empty){
@@ -1133,11 +1202,14 @@ async function registerFace(){
                 "⚠️ Aapka face pehle se registered hai."
             );
 
+
             alert(
                 "⚠️ Aapka face pehle se registered hai."
             );
 
+
             return;
+
         }
 
 
@@ -1146,14 +1218,18 @@ async function registerFace(){
 
 
         await addDoc(
-            collection(db,"teachers"),
+            collection(
+                db,
+                "teachers"
+            ),
             {
 
                 uid:
                     currentUser.uid,
 
                 name:
-                    name || currentUser.email,
+                    name ||
+                    currentUser.email,
 
                 email:
                     currentUser.email,
@@ -1186,27 +1262,33 @@ async function registerFace(){
 
         console.error(error);
 
+
         setStatus(
             "❌ Face registration error."
         );
+
 
         alert(
             "Face registration error:\n\n" +
             error.message
         );
 
+
     }finally{
 
         document
-            .getElementById("registerFaceButton")
-            .disabled = false;
+            .getElementById(
+                "registerFaceButton"
+            )
+            .disabled =
+            !faceapiLoaded;
 
     }
 
 }
 
 
-/* ================= ATTENDANCE ================= */
+/* ================= OPEN ATTENDANCE ================= */
 
 async function openAttendance(){
 
@@ -1217,6 +1299,7 @@ async function openAttendance(){
         );
 
         return;
+
     }
 
 
@@ -1250,11 +1333,14 @@ async function openAttendance(){
             "❌ Aapka face registered nahi hai.\nPehle Face Registration karein."
         );
 
+
         alert(
             "❌ Pehle apna face register karein."
         );
 
+
         return;
+
     }
 
 
@@ -1282,18 +1368,22 @@ async function startAttendanceCamera(){
             );
 
             return;
+
         }
 
 
         const video =
             document
-            .getElementById("attendanceCamera");
+            .getElementById(
+                "attendanceCamera"
+            );
 
 
         attendanceStream =
             await navigator.mediaDevices.getUserMedia({
 
                 video:{
+
                     facingMode:{
                         ideal:"user"
                     },
@@ -1328,8 +1418,11 @@ async function startAttendanceCamera(){
 
 
         document
-            .getElementById("attendanceButton")
-            .disabled = !faceapiLoaded;
+            .getElementById(
+                "attendanceButton"
+            )
+            .disabled =
+            !faceapiLoaded;
 
 
         if(faceapiLoaded){
@@ -1360,13 +1453,16 @@ async function startAttendanceCamera(){
 }
 
 
+/* ================= STOP ATTENDANCE CAMERA ================= */
+
 function stopAttendanceCamera(){
 
     if(attendanceStream){
 
         attendanceStream
             .getTracks()
-            .forEach(track =>
+            .forEach(
+                track =>
                 track.stop()
             );
 
@@ -1388,6 +1484,7 @@ async function checkFace(){
         );
 
         return;
+
     }
 
 
@@ -1398,6 +1495,7 @@ async function checkFace(){
         );
 
         return;
+
     }
 
 
@@ -1407,16 +1505,21 @@ async function checkFace(){
             "Camera start nahi hua."
         );
 
+
         await startAttendanceCamera();
 
+
         return;
+
     }
 
 
     try{
 
         document
-            .getElementById("attendanceButton")
+            .getElementById(
+                "attendanceButton"
+            )
             .disabled = true;
 
 
@@ -1432,6 +1535,7 @@ async function checkFace(){
         if(!locationOK){
 
             return;
+
         }
 
 
@@ -1442,7 +1546,9 @@ async function checkFace(){
 
         const video =
             document
-            .getElementById("attendanceCamera");
+            .getElementById(
+                "attendanceCamera"
+            );
 
 
         await waitForVideo(video);
@@ -1471,6 +1577,7 @@ async function checkFace(){
             );
 
             return;
+
         }
 
 
@@ -1481,7 +1588,10 @@ async function checkFace(){
 
         const myFaceQuery =
             query(
-                collection(db,"teachers"),
+                collection(
+                    db,
+                    "teachers"
+                ),
                 where(
                     "uid",
                     "==",
@@ -1492,7 +1602,9 @@ async function checkFace(){
 
 
         const snapshot =
-            await getDocs(myFaceQuery);
+            await getDocs(
+                myFaceQuery
+            );
 
 
         if(snapshot.empty){
@@ -1501,11 +1613,14 @@ async function checkFace(){
                 "❌ Aapka face registered nahi hai."
             );
 
+
             alert(
                 "Pehle Face Registration karein."
             );
 
+
             return;
+
         }
 
 
@@ -1520,6 +1635,7 @@ async function checkFace(){
             );
 
             return;
+
         }
 
 
@@ -1548,11 +1664,14 @@ async function checkFace(){
                 "❌ Face match nahi hua."
             );
 
+
             alert(
                 "❌ Face match nahi hua.\nDobara camera ke samne face rakhein."
             );
 
+
             return;
+
         }
 
 
@@ -1560,8 +1679,6 @@ async function checkFace(){
             "✅ Face matched.\nAttendance check ho rahi hai..."
         );
 
-
-        /* DATE KEY */
 
         const now =
             new Date();
@@ -1579,11 +1696,14 @@ async function checkFace(){
             now.toLocaleTimeString();
 
 
-        /* DUPLICATE CHECK */
+        /* ================= DUPLICATE CHECK ================= */
 
         const duplicateQuery =
             query(
-                collection(db,"attendance"),
+                collection(
+                    db,
+                    "attendance"
+                ),
                 where(
                     "uid",
                     "==",
@@ -1610,15 +1730,18 @@ async function checkFace(){
                 "⚠️ Aaj ki attendance pehle hi lag chuki hai."
             );
 
+
             alert(
                 "⚠️ Aaj aapki attendance already present hai."
             );
 
+
             return;
+
         }
 
 
-        /* SAVE */
+        /* ================= SAVE ATTENDANCE ================= */
 
         const attendance = {
 
@@ -1651,7 +1774,10 @@ async function checkFace(){
 
 
         await addDoc(
-            collection(db,"attendance"),
+            collection(
+                db,
+                "attendance"
+            ),
             attendance
         );
 
@@ -1685,21 +1811,27 @@ async function checkFace(){
 
         console.error(error);
 
+
         setStatus(
             "❌ Attendance error:\n" +
             error.message
         );
+
 
         alert(
             "Attendance error:\n\n" +
             error.message
         );
 
+
     }finally{
 
         document
-            .getElementById("attendanceButton")
-            .disabled = false;
+            .getElementById(
+                "attendanceButton"
+            )
+            .disabled =
+            false;
 
     }
 
@@ -1714,7 +1846,10 @@ async function hasRegisteredFace(){
 
         const q =
             query(
-                collection(db,"teachers"),
+                collection(
+                    db,
+                    "teachers"
+                ),
                 where(
                     "uid",
                     "==",
@@ -1729,6 +1864,7 @@ async function hasRegisteredFace(){
 
 
         return !result.empty;
+
 
     }catch(error){
 
@@ -1756,6 +1892,7 @@ async function checkSchoolLocation(){
             );
 
             return false;
+
         }
 
 
@@ -1776,6 +1913,7 @@ async function checkSchoolLocation(){
             );
 
             return false;
+
         }
 
 
@@ -1793,6 +1931,7 @@ async function checkSchoolLocation(){
             );
 
             return false;
+
         }
 
 
@@ -1845,9 +1984,11 @@ async function checkSchoolLocation(){
                             " meter"
                         );
 
+
                         setStatus(
                             "❌ School location se bahar."
                         );
+
 
                         resolve(false);
 
@@ -1859,4 +2000,1034 @@ async function checkSchoolLocation(){
 
                     console.error(error);
 
-                    alert(
+
+                    let message =
+                        "❌ Location nahi mil saki.";
+
+
+                    if(
+                        error.code === 1
+                    ){
+
+                        message =
+                            "❌ Location permission denied.\nPhone ki Location permission allow karein.";
+
+                    }
+
+
+                    if(
+                        error.code === 2
+                    ){
+
+                        message =
+                            "❌ Location available nahi hai.";
+
+                    }
+
+
+                    if(
+                        error.code === 3
+                    ){
+
+                        message =
+                            "❌ Location check timeout ho gaya.";
+
+                    }
+
+
+                    alert(message);
+
+
+                    setStatus(message);
+
+
+                    resolve(false);
+
+                },
+
+                {
+
+                    enableHighAccuracy:true,
+
+                    timeout:15000,
+
+                    maximumAge:0
+
+                }
+
+            );
+
+        });
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        alert(
+            "Location check error:\n" +
+            error.message
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* ================= DISTANCE ================= */
+
+function calculateDistance(
+    lat1,
+    lon1,
+    lat2,
+    lon2
+){
+
+    const R =
+        6371000;
+
+
+    const dLat =
+        (lat2-lat1) *
+        Math.PI /
+        180;
+
+
+    const dLon =
+        (lon2-lon1) *
+        Math.PI /
+        180;
+
+
+    const a =
+        Math.sin(dLat/2) *
+        Math.sin(dLat/2) +
+
+        Math.cos(
+            lat1 *
+            Math.PI /
+            180
+        ) *
+
+        Math.cos(
+            lat2 *
+            Math.PI /
+            180
+        ) *
+
+        Math.sin(dLon/2) *
+        Math.sin(dLon/2);
+
+
+    const c =
+        2 *
+        Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1-a)
+        );
+
+
+    return R * c;
+
+}
+
+
+/* ================= WAIT VIDEO ================= */
+
+function waitForVideo(video){
+
+    return new Promise(resolve => {
+
+        if(
+            video.readyState >= 2 &&
+            video.videoWidth > 0
+        ){
+
+            resolve();
+
+            return;
+
+        }
+
+
+        const check = () => {
+
+            if(
+                video.readyState >= 2 &&
+                video.videoWidth > 0
+            ){
+
+                video.removeEventListener(
+                    "loadeddata",
+                    check
+                );
+
+                video.removeEventListener(
+                    "canplay",
+                    check
+                );
+
+                resolve();
+
+            }
+
+        };
+
+
+        video.addEventListener(
+            "loadeddata",
+            check
+        );
+
+
+        video.addEventListener(
+            "canplay",
+            check
+        );
+
+
+        setTimeout(
+            () => resolve(),
+            5000
+        );
+
+    });
+
+}
+
+
+/* ================= CAMERA ERROR ================= */
+
+function getCameraError(error){
+
+    if(
+        !error
+    ){
+
+        return "❌ Camera error.";
+
+    }
+
+
+    if(
+        error.name ===
+        "NotAllowedError"
+    ){
+
+        return (
+            "❌ Camera permission required.\n" +
+            "Camera permission Allow karein."
+        );
+
+    }
+
+
+    if(
+        error.name ===
+        "NotFoundError"
+    ){
+
+        return (
+            "❌ Camera nahi mila."
+        );
+
+    }
+
+
+    if(
+        error.name ===
+        "NotReadableError"
+    ){
+
+        return (
+            "❌ Camera kisi aur app mein use ho raha hai."
+        );
+
+    }
+
+
+    if(
+        error.name ===
+        "SecurityError"
+    ){
+
+        return (
+            "❌ Camera security permission issue."
+        );
+
+    }
+
+
+    return (
+        "❌ Camera error:\n" +
+        error.message
+    );
+
+}
+
+
+/* ================= LOCAL HISTORY ================= */
+
+function saveLocalHistory(
+    attendance
+){
+
+    try{
+
+        const key =
+            "teacherAttendanceHistory";
+
+
+        const old =
+            JSON.parse(
+                localStorage.getItem(key) ||
+                "[]"
+            );
+
+
+        old.unshift(
+            attendance
+        );
+
+
+        localStorage.setItem(
+            key,
+            JSON.stringify(old)
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* ================= SHOW HISTORY ================= */
+
+async function showHistory(){
+
+    if(!currentUser){
+
+        alert(
+            "Pehle login karein."
+        );
+
+        return;
+
+    }
+
+
+    backToDashboard();
+
+
+    setStatus(
+        "⏳ Attendance history load ho rahi hai..."
+    );
+
+
+    const history =
+        document.getElementById(
+            "history"
+        );
+
+
+    history.innerHTML =
+        "<h2>📋 My Attendance History</h2>";
+
+
+    try{
+
+        const q =
+            query(
+                collection(
+                    db,
+                    "attendance"
+                ),
+                where(
+                    "uid",
+                    "==",
+                    currentUser.uid
+                )
+            );
+
+
+        const snapshot =
+            await getDocs(q);
+
+
+        if(snapshot.empty){
+
+            history.innerHTML +=
+                "<p>Abhi attendance record nahi mila.</p>";
+
+            setStatus(
+                "📋 Koi attendance record nahi mila."
+            );
+
+            return;
+
+        }
+
+
+        const records =
+            [];
+
+
+        snapshot.forEach(
+            item => {
+
+                records.push(
+                    item.data()
+                );
+
+            }
+        );
+
+
+        records.sort(
+            (a,b) => {
+
+                const ta =
+                    new Date(
+                        a.timestamp ||
+                        0
+                    ).getTime();
+
+
+                const tb =
+                    new Date(
+                        b.timestamp ||
+                        0
+                    ).getTime();
+
+
+                return tb-ta;
+
+            }
+        );
+
+
+        records.forEach(
+            record => {
+
+                history.innerHTML += `
+
+                    <div class="record">
+
+                        <strong>
+                            👨‍🏫 ${escapeHtml(record.name || "")}
+                        </strong>
+
+                        <br>
+
+                        Status:
+                        ${escapeHtml(record.status || "Present")}
+
+                        <br>
+
+                        📅 Date:
+                        ${escapeHtml(record.date || "")}
+
+                        <br>
+
+                        ⏰ Time:
+                        ${escapeHtml(record.time || "")}
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+        setStatus(
+            "✅ Attendance history loaded."
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        history.innerHTML +=
+            "<p>❌ History load nahi hui.</p>";
+
+
+        setStatus(
+            "❌ History error:\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ================= MONTHLY REPORT ================= */
+
+async function showMonthlyReport(){
+
+    if(!currentUser){
+
+        alert(
+            "Pehle login karein."
+        );
+
+        return;
+
+    }
+
+
+    document
+        .getElementById("dashboard")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("faceRegistrationBox")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("attendanceBox")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("monthlyReportBox")
+        .classList.remove("hidden");
+
+
+    const name =
+        await getMyTeacherName();
+
+
+    document
+        .getElementById(
+            "reportTeacherName"
+        )
+        .value =
+        name || currentUser.email;
+
+
+    const monthInput =
+        document
+        .getElementById(
+            "reportMonth"
+        );
+
+
+    if(!monthInput.value){
+
+        const now =
+            new Date();
+
+
+        monthInput.value =
+            now.getFullYear() +
+            "-" +
+            String(
+                now.getMonth()+1
+            ).padStart(2,"0");
+
+    }
+
+
+    setStatus(
+        "📊 Monthly report fill karein."
+    );
+
+}
+
+
+/* ================= MONTHLY REPORT SAVE ================= */
+
+async function submitMonthlyReport(){
+
+    if(!currentUser){
+
+        alert(
+            "Pehle login karein."
+        );
+
+        return;
+
+    }
+
+
+    const teacherName =
+        document
+        .getElementById(
+            "reportTeacherName"
+        )
+        .value
+        .trim();
+
+
+    const month =
+        document
+        .getElementById(
+            "reportMonth"
+        )
+        .value;
+
+
+    const className =
+        document
+        .getElementById(
+            "reportClass"
+        )
+        .value
+        .trim();
+
+
+    if(!month){
+
+        alert(
+            "Month select karein."
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        setStatus(
+            "⏳ Monthly report save ho rahi hai..."
+        );
+
+
+        const report = {
+
+            uid:
+                currentUser.uid,
+
+            teacherName:
+                teacherName,
+
+            email:
+                currentUser.email,
+
+            month:
+                month,
+
+            className:
+                className,
+
+            English:{
+
+                total:
+                    getNumber("engTotal"),
+
+                read:
+                    getNumber("engRead"),
+
+                write:
+                    getNumber("engWrite"),
+
+                checked:
+                    getNumber("engChecked"),
+
+                unchecked:
+                    getNumber("engUnchecked")
+
+            },
+
+            Urdu:{
+
+                total:
+                    getNumber("urduTotal"),
+
+                read:
+                    getNumber("urduRead"),
+
+                write:
+                    getNumber("urduWrite"),
+
+                checked:
+                    getNumber("urduChecked"),
+
+                unchecked:
+                    getNumber("urduUnchecked")
+
+            },
+
+            Math:{
+
+                total:
+                    getNumber("mathTotal"),
+
+                read:
+                    getNumber("mathRead"),
+
+                write:
+                    getNumber("mathWrite"),
+
+                checked:
+                    getNumber("mathChecked"),
+
+                unchecked:
+                    getNumber("mathUnchecked")
+
+            },
+
+            Sindhi:{
+
+                total:
+                    getNumber("sindhiTotal"),
+
+                read:
+                    getNumber("sindhiRead"),
+
+                write:
+                    getNumber("sindhiWrite"),
+
+                checked:
+                    getNumber("sindhiChecked"),
+
+                unchecked:
+                    getNumber("sindhiUnchecked")
+
+            },
+
+            SS:{
+
+                total:
+                    getNumber("ssTotal"),
+
+                read:
+                    getNumber("ssRead"),
+
+                write:
+                    getNumber("ssWrite"),
+
+                checked:
+                    getNumber("ssChecked"),
+
+                unchecked:
+                    getNumber("ssUnchecked")
+
+            },
+
+            Islamiat:{
+
+                total:
+                    getNumber("islTotal"),
+
+                read:
+                    getNumber("islRead"),
+
+                write:
+                    getNumber("islWrite"),
+
+                checked:
+                    getNumber("islChecked"),
+
+                unchecked:
+                    getNumber("islUnchecked")
+
+            },
+
+            "G. Science":{
+
+                total:
+                    getNumber("scienceTotal"),
+
+                read:
+                    getNumber("scienceRead"),
+
+                write:
+                    getNumber("scienceWrite"),
+
+                checked:
+                    getNumber("scienceChecked"),
+
+                unchecked:
+                    getNumber("scienceUnchecked")
+
+            },
+
+            teacherSignature:
+                document
+                .getElementById(
+                    "teacherSignature"
+                )
+                .value
+                .trim(),
+
+            timestamp:
+                new Date().toISOString()
+
+        };
+
+
+        await addDoc(
+            collection(
+                db,
+                "monthlyReports"
+            ),
+            report
+        );
+
+
+        setStatus(
+            "✅ Monthly report successfully save ho gayi."
+        );
+
+
+        alert(
+            "✅ Monthly report successfully save ho gayi."
+        );
+
+
+    }catch(error){
+
+        console.error(error);
+
+
+        setStatus(
+            "❌ Monthly report save nahi hui."
+        );
+
+
+        alert(
+            "Monthly report error:\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* ================= NUMBER ================= */
+
+function getNumber(id){
+
+    const value =
+        document
+        .getElementById(id)
+        .value;
+
+
+    if(value === ""){
+
+        return 0;
+
+    }
+
+
+    return Number(value);
+
+}
+
+
+/* ================= HTML SAFE ================= */
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+/* ================= STOP CAMERAS ================= */
+
+function stopCameras(){
+
+    stopRegistrationCamera();
+
+    stopAttendanceCamera();
+
+}
+
+
+/* ================= FACE API LOAD ================= */
+
+async function loadFaceApi(){
+
+    try{
+
+        setStatus(
+            "⏳ Face system load ho raha hai..."
+        );
+
+
+        if(
+            typeof faceapi ===
+            "undefined"
+        ){
+
+            setStatus(
+                "❌ Face API load nahi hui."
+            );
+
+            return;
+
+        }
+
+
+        const MODEL_URL =
+            "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+
+
+        await Promise.all([
+
+            faceapi.nets.tinyFaceDetector.loadFromUri(
+                MODEL_URL
+            ),
+
+            faceapi.nets.faceLandmark68Net.loadFromUri(
+                MODEL_URL
+            ),
+
+            faceapi.nets.faceRecognitionNet.loadFromUri(
+                MODEL_URL
+            )
+
+        ]);
+
+
+        faceapiLoaded = true;
+
+
+        console.log(
+            "Face API models loaded."
+        );
+
+
+        if(currentUser){
+
+            const regButton =
+                document
+                .getElementById(
+                    "registerFaceButton"
+                );
+
+
+            const attendanceButton =
+                document
+                .getElementById(
+                    "attendanceButton"
+                );
+
+
+            if(
+                registrationStream
+            ){
+
+                regButton.disabled =
+                    false;
+
+            }
+
+
+            if(
+                attendanceStream
+            ){
+
+                attendanceButton.disabled =
+                    false;
+
+            }
+
+
+            setStatus(
+                "✅ Face system ready."
+            );
+
+        }else{
+
+            setStatus(
+                "Login karein."
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            "Face API error:",
+            error
+        );
+
+
+        faceapiLoaded = false;
+
+
+        setStatus(
+            "❌ Face system load nahi hua.\nInternet connection check karein."
+        );
+
+    }
+
+}
+
+
+/* ================= GLOBAL BUTTON FUNCTIONS ================= */
+
+/*
+   Firebase script module hai.
+   Is liye HTML onclick buttons ke liye
+   functions ko window par expose karna zaroori hai.
+*/
+
+window.login =
+    login;
+
+window.logout =
+    logout;
+
+window.openFaceRegistration =
+    openFaceRegistration;
+
+window.openAttendance =
+    openAttendance;
+
+window.showMonthlyReport =
+    showMonthlyReport;
+
+window.showHistory =
+    showHistory;
+
+window.backToDashboard =
+    backToDashboard;
+
+window.startRegistrationCamera =
+    startRegistrationCamera;
+
+window.registerFace =
+    registerFace;
+
+window.checkFace =
+    checkFace;
+
+window.submitMonthlyReport =
+    submitMonthlyReport;
+
+
+/* ================= START FACE API ================= */
+
+loadFaceApi();
+
+</script>
+
+</body>
+</html>
