@@ -7,6 +7,7 @@
 
 <title>Teachers Face Attendance</title>
 
+<!-- FACE API -->
 <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
 
 <style>
@@ -24,36 +25,44 @@ body{
 }
 
 .container{
-    width:94%;
+    width:100%;
     max-width:500px;
-    margin:25px auto;
+    margin:auto;
+    padding:20px;
 }
 
 .card{
     background:white;
     border-radius:18px;
     padding:22px;
-    box-shadow:0 5px 20px rgba(0,0,0,.12);
-    margin-bottom:20px;
+    margin-top:25px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.12);
 }
 
-h1,h2,h3{
+h1{
     text-align:center;
+    color:#174a8b;
+    margin-bottom:8px;
+}
+
+h2{
+    text-align:center;
+    color:#174a8b;
 }
 
 .school{
     text-align:center;
     font-weight:bold;
-    color:#1565c0;
+    font-size:18px;
     margin-bottom:20px;
 }
 
 input{
     width:100%;
-    padding:13px;
-    margin:7px 0 12px;
+    padding:14px;
+    margin:8px 0 14px;
     border:1px solid #ccc;
-    border-radius:8px;
+    border-radius:10px;
     font-size:16px;
 }
 
@@ -62,54 +71,49 @@ button{
     padding:14px;
     margin:7px 0;
     border:0;
-    border-radius:9px;
-    font-size:17px;
+    border-radius:10px;
+    background:#1769aa;
+    color:white;
+    font-size:16px;
     font-weight:bold;
     cursor:pointer;
 }
 
-.loginBtn{
-    background:#1565c0;
-    color:white;
+button:active{
+    transform:scale(0.98);
 }
 
-.faceBtn{
-    background:#1976d2;
-    color:white;
+.back{
+    background:#666;
 }
 
-.attBtn{
-    background:#2e7d32;
-    color:white;
-}
-
-.adminBtn{
-    background:#1565c0;
-    color:white;
-}
-
-.backBtn{
-    background:#555;
-    color:white;
-}
-
-.logoutBtn{
+.danger{
     background:#c62828;
-    color:white;
 }
 
-video{
-    width:100%;
-    border-radius:15px;
-    background:#111;
-    margin:10px 0;
+.success{
+    background:#198754;
+}
+
+.menu-btn{
+    min-height:58px;
 }
 
 .status{
     text-align:center;
+    margin:14px 0;
     font-weight:bold;
-    margin:12px 0;
-    min-height:24px;
+    min-height:22px;
+}
+
+video{
+    width:100%;
+    max-width:420px;
+    display:block;
+    margin:15px auto;
+    border-radius:15px;
+    background:#111;
+    transform:scaleX(-1);
 }
 
 .hidden{
@@ -118,7 +122,9 @@ video{
 
 .welcome{
     text-align:center;
-    font-size:18px;
+    font-size:19px;
+    font-weight:bold;
+    color:#1769aa;
     margin-bottom:20px;
 }
 
@@ -126,6 +132,13 @@ video{
     text-align:center;
     color:#666;
     font-size:14px;
+    margin-top:8px;
+}
+
+.loading{
+    text-align:center;
+    padding:30px;
+    font-weight:bold;
 }
 
 </style>
@@ -136,10 +149,7 @@ video{
 
 <div class="container">
 
-
-<!-- =====================================================
-     LOGIN
-===================================================== -->
+<!-- ================= LOGIN ================= -->
 
 <div id="loginPage" class="card">
 
@@ -153,7 +163,7 @@ video{
 
     <input
         type="email"
-        id="loginEmail"
+        id="email"
         placeholder="Teacher Email"
     >
 
@@ -161,202 +171,161 @@ video{
 
     <input
         type="password"
-        id="loginPassword"
+        id="password"
         placeholder="Password"
     >
 
-    <button
-        class="loginBtn"
-        onclick="loginTeacher()"
-    >
+    <button onclick="loginTeacher()">
         🔐 Login
     </button>
 
-    <div
-        id="loginStatus"
-        class="status"
-    ></div>
+    <div id="loginStatus" class="status"></div>
 
 </div>
 
 
-<!-- =====================================================
-     TEACHER MENU
-===================================================== -->
+<!-- ================= MENU ================= -->
 
 <div id="menuPage" class="card hidden">
 
-    <h1>👨‍🏫 Teacher Menu</h1>
+    <h1>👨‍🏫 Teachers Face Attendance</h1>
 
     <div class="school">
         Moon Star Public High School Khanwahan
     </div>
 
-    <div
-        id="welcomeText"
-        class="welcome"
-    ></div>
-
+    <div id="welcomeText" class="welcome">
+        Welcome
+    </div>
 
     <button
-        class="faceBtn"
-        onclick="openPage('faceRegistration')"
-    >
-        📷 Face Registration
+        class="menu-btn"
+        onclick="openPage('faceRegistration')">
+        👤 Face Registration
     </button>
 
-
     <button
-        class="attBtn"
-        onclick="openPage('markAttendance')"
-    >
-        ✅ Mark Attendance
+        class="menu-btn"
+        onclick="openPage('markAttendance')">
+        📷 Mark Attendance
     </button>
 
-
     <button
-        class="adminBtn"
-        onclick="openPrincipalRecord()"
-    >
+        class="menu-btn"
+        onclick="openPrincipalRecord()">
         📊 Principal Record
     </button>
 
-
     <button
-        class="logoutBtn"
-        onclick="logoutTeacher()"
-    >
+        class="menu-btn danger"
+        onclick="logoutTeacher()">
         🚪 Logout
     </button>
 
 </div>
 
 
-<!-- =====================================================
-     FACE REGISTRATION
-===================================================== -->
+<!-- ================= FACE REGISTRATION ================= -->
 
-<div
-    id="faceRegistration"
-    class="card hidden"
->
+<div id="faceRegistration" class="card hidden">
 
-    <h2>👤 Face Registration</h2>
+    <h1>👤 Face Registration</h1>
 
     <div class="school">
-        Register Teacher Face
+        Moon Star Public High School Khanwahan
+    </div>
+
+    <div id="registrationWelcome" class="welcome">
+        Teacher
     </div>
 
     <p class="small">
         Apna face camera ke samne rakhein.
     </p>
 
-
     <video
-        id="video"
+        id="registrationVideo"
         autoplay
         muted
-        playsinline
-    ></video>
+        playsinline>
+    </video>
 
-
-    <button
-        class="faceBtn"
-        onclick="startRegistrationCamera()"
-    >
+    <button onclick="startRegistrationCamera()">
         📷 Start Camera
     </button>
 
-
     <button
-        class="faceBtn"
-        onclick="registerFace()"
-    >
+        class="success"
+        onclick="registerFace()">
         👤 Register My Face
     </button>
 
+    <button
+        class="back"
+        onclick="openPage('menu')">
+        ← Back
+    </button>
 
     <div
         id="registrationStatus"
-        class="status"
-    ></div>
-
-
-    <button
-        class="backBtn"
-        onclick="openPage('menu')"
-    >
-        ← Back
-    </button>
+        class="status">
+    </div>
 
 </div>
 
 
-<!-- =====================================================
-     MARK ATTENDANCE
-===================================================== -->
+<!-- ================= MARK ATTENDANCE ================= -->
 
-<div
-    id="markAttendance"
-    class="card hidden"
->
+<div id="markAttendance" class="card hidden">
 
-    <h2>✅ Mark Attendance</h2>
+    <h1>📷 Mark Attendance</h1>
 
     <div class="school">
-        Teacher Attendance
+        Moon Star Public High School Khanwawan
+    </div>
+
+    <div id="attendanceWelcome" class="welcome">
+        Teacher
     </div>
 
     <p class="small">
-        Apna registered face camera ke samne rakhein.
+        Camera ke samne apna face rakhein.
     </p>
 
-
     <video
-        id="videoAttendance"
+        id="attendanceVideo"
         autoplay
         muted
-        playsinline
-    ></video>
+        playsinline>
+    </video>
 
-
-    <button
-        class="attBtn"
-        onclick="startAttendanceCamera()"
-    >
+    <button onclick="startAttendanceCamera()">
         📷 Start Camera
     </button>
 
-
     <button
-        class="attBtn"
-        onclick="markAttendance()"
-    >
+        class="success"
+        onclick="markAttendance()">
         ✅ Mark Attendance
     </button>
 
-
-    <div
-        id="attendanceStatus"
-        class="status"
-    ></div>
-
-
     <button
-        class="backBtn"
-        onclick="openPage('menu')"
-    >
+        class="back"
+        onclick="openPage('menu')">
         ← Back
     </button>
 
-</div>
+    <div
+        id="attendanceStatus"
+        class="status">
+    </div>
 
+</div>
 
 </div>
 
 
 <script type="module">
-
 
 /* =====================================================
    FIREBASE
@@ -364,9 +333,7 @@ video{
 
 import {
     initializeApp
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
     getFirestore,
@@ -376,14 +343,18 @@ import {
     query,
     where,
     serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 /*
-=========================================================
-APNI WORKING FIREBASE CONFIG YAHAN RAKHEIN
-=========================================================
+========================================================
+IMPORTANT
+
+YAHAN APNI WOHI FIREBASE CONFIG PASTE KAREIN
+JO AAPKE PURANE WORKING CODE MEIN THI.
+
+YOUR_API_KEY waghera ko apni actual values se replace karein.
+========================================================
 */
 
 const firebaseConfig = {
@@ -408,188 +379,276 @@ const firebaseConfig = {
 };
 
 
-const app =
-    initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-
-const db =
-    getFirestore(app);
+const db = getFirestore(app);
 
 
 /* =====================================================
-   LOGIN
+   GLOBAL VARIABLES
 ===================================================== */
-
-const LOGIN_EMAIL =
-    "ashfaque.thebo@gmail.com";
-
-
-const LOGIN_PASSWORD =
-    "123456789";
-
 
 let currentUser =
     localStorage.getItem("teacherName") || "";
 
+let cameraStream = null;
 
-/* =====================================================
-   PAGE CONTROL
-===================================================== */
-
-window.openPage = function(page){
-
-    /*
-       IMPORTANT:
-       Yahan Face Registration aur Mark Attendance
-       ke liye login check NAHI hai.
-
-       Login ke baad currentUser save hota hai.
-    */
-
-
-    if(
-        page === "faceRegistration" &&
-        !currentUser
-    ){
-
-        showOnly("loginPage");
-
-        return;
-
-    }
-
-
-    if(
-        page === "markAttendance" &&
-        !currentUser
-    ){
-
-        showOnly("loginPage");
-
-        return;
-
-    }
-
-
-    if(
-        page === "menu" &&
-        !currentUser
-    ){
-
-        showOnly("loginPage");
-
-        return;
-
-    }
-
-
-    showOnly(
-        page === "menu"
-        ? "menuPage"
-        : page
-    );
-
-
-    if(page === "faceRegistration"){
-
-        stopAllCameras();
-
-        document.getElementById(
-            "registrationStatus"
-        ).innerText = "";
-
-    }
-
-
-    if(page === "markAttendance"){
-
-        stopAllCameras();
-
-        document.getElementById(
-            "attendanceStatus"
-        ).innerText = "";
-
-    }
-
-};
+let modelsLoaded = false;
 
 
 /* =====================================================
-   SHOW PAGE
+   PAGE ELEMENTS
 ===================================================== */
 
-function showOnly(id){
+const loginPage =
+    document.getElementById("loginPage");
 
-    const pages = [
+const menuPage =
+    document.getElementById("menuPage");
 
-        "loginPage",
-        "menuPage",
-        "faceRegistration",
-        "markAttendance"
+const faceRegistration =
+    document.getElementById("faceRegistration");
 
-    ];
-
-
-    pages.forEach(function(page){
-
-        const element =
-            document.getElementById(page);
+const markAttendancePage =
+    document.getElementById("markAttendance");
 
 
-        if(element){
+/* =====================================================
+   SHOW ONLY ONE PAGE
+===================================================== */
 
-            element.classList.add("hidden");
+function showOnly(page){
 
-        }
+    loginPage.classList.add("hidden");
 
-    });
+    menuPage.classList.add("hidden");
+
+    faceRegistration.classList.add("hidden");
+
+    markAttendancePage.classList.add("hidden");
+
+    page.classList.remove("hidden");
+}
 
 
-    const target =
-        document.getElementById(id);
+/* =====================================================
+   STOP CAMERA
+===================================================== */
 
+function stopCamera(){
 
-    if(target){
+    if(cameraStream){
 
-        target.classList.remove("hidden");
+        cameraStream.getTracks().forEach(
+            track => track.stop()
+        );
 
+        cameraStream = null;
     }
 
 }
 
 
 /* =====================================================
-   LOGIN
+   STOP ALL CAMERAS
 ===================================================== */
 
-window.loginTeacher = function(){
+function stopAllCameras(){
+
+    stopCamera();
+
+}
+
+
+/* =====================================================
+   OPEN PAGE
+===================================================== */
+
+window.openPage = async function(page){
+
+    /*
+    LOGIN PAGE
+    */
+
+    if(page === "login"){
+
+        stopAllCameras();
+
+        showOnly(loginPage);
+
+        return;
+    }
+
+
+    /*
+    MENU
+    */
+
+    if(page === "menu"){
+
+        if(!currentUser){
+
+            showOnly(loginPage);
+
+            return;
+        }
+
+        document.getElementById(
+            "welcomeText"
+        ).innerText =
+            "Welcome " + currentUser;
+
+        stopAllCameras();
+
+        showOnly(menuPage);
+
+        return;
+    }
+
+
+    /*
+    FACE REGISTRATION
+
+    IMPORTANT:
+    YAHAN KOI LOGIN REDIRECT NAHI HAI.
+    */
+
+    if(page === "faceRegistration"){
+
+        if(!currentUser){
+
+            alert(
+                "Pehle Teacher Login karein."
+            );
+
+            showOnly(loginPage);
+
+            return;
+        }
+
+        document.getElementById(
+            "registrationWelcome"
+        ).innerText =
+            "Welcome " + currentUser;
+
+        document.getElementById(
+            "registrationStatus"
+        ).innerText = "";
+
+        showOnly(faceRegistration);
+
+        return;
+    }
+
+
+    /*
+    MARK ATTENDANCE
+
+    IMPORTANT:
+    YAHAN BHI KOI DOBARA LOGIN NAHI HAI.
+    */
+
+    if(page === "markAttendance"){
+
+        if(!currentUser){
+
+            alert(
+                "Pehle Teacher Login karein."
+            );
+
+            showOnly(loginPage);
+
+            return;
+        }
+
+        document.getElementById(
+            "attendanceWelcome"
+        ).innerText =
+            "Welcome " + currentUser;
+
+        document.getElementById(
+            "attendanceStatus"
+        ).innerText = "";
+
+        showOnly(markAttendancePage);
+
+        return;
+    }
+
+};
+
+
+/* =====================================================
+   PRINCIPAL RECORD
+===================================================== */
+
+window.openPrincipalRecord = function(){
+
+    if(!currentUser){
+
+        showOnly(loginPage);
+
+        return;
+    }
+
+    window.location.href = "Admin.html";
+
+};
+
+
+/* =====================================================
+   TEACHER LOGIN
+===================================================== */
+
+window.loginTeacher = async function(){
 
     const email =
-        document.getElementById(
-            "loginEmail"
-        ).value.trim();
-
+        document.getElementById("email")
+        .value.trim();
 
     const password =
-        document.getElementById(
-            "loginPassword"
-        ).value;
-
+        document.getElementById("password")
+        .value.trim();
 
     const status =
-        document.getElementById(
-            "loginStatus"
-        );
+        document.getElementById("loginStatus");
 
+
+    if(!email || !password){
+
+        status.innerText =
+            "Email aur Password dono enter karein.";
+
+        return;
+    }
+
+
+    /*
+    APNA EXISTING LOGIN EMAIL/PASSWORD
+    YAHAN RAKHEIN.
+    */
 
     if(
-        email === LOGIN_EMAIL &&
-        password === LOGIN_PASSWORD
+        email.toLowerCase() ===
+        "ashfaque.thebo@gmail.com"
+
+        &&
+        
+        password ===
+        "123456789"
     ){
 
-        currentUser =
-            "Ashfaque";
+        currentUser = "Ashfaque";
 
+
+        /*
+        LOGIN SESSION SAVE
+        */
+
+        localStorage.setItem(
+            "teacherName",
+            currentUser
+        );
 
         localStorage.setItem(
             "teacherLoggedIn",
@@ -597,14 +656,8 @@ window.loginTeacher = function(){
         );
 
 
-        localStorage.setItem(
-            "teacherName",
-            currentUser
-        );
-
-
         status.innerText =
-            "✅ Login successful";
+            "Login successful.";
 
 
         document.getElementById(
@@ -613,17 +666,13 @@ window.loginTeacher = function(){
             "Welcome " + currentUser;
 
 
-        setTimeout(function(){
+        showOnly(menuPage);
 
-            showOnly("menuPage");
-
-        },500);
-
-
-    }else{
+    }
+    else{
 
         status.innerText =
-            "❌ Email ya password ghalat hai.";
+            "Email ya Password ghalat hai.";
 
     }
 
@@ -638,254 +687,120 @@ window.logoutTeacher = function(){
 
     stopAllCameras();
 
+    localStorage.removeItem(
+        "teacherName"
+    );
 
     localStorage.removeItem(
         "teacherLoggedIn"
     );
 
-
-    localStorage.removeItem(
-        "teacherName"
-    );
-
-
     currentUser = "";
 
-
     document.getElementById(
-        "loginEmail"
+        "email"
     ).value = "";
 
-
     document.getElementById(
-        "loginPassword"
+        "password"
     ).value = "";
-
 
     document.getElementById(
         "loginStatus"
     ).innerText = "";
 
-
-    showOnly("loginPage");
-
-};
-
-
-/* =====================================================
-   PRINCIPAL RECORD
-===================================================== */
-
-window.openPrincipalRecord = function(){
-
-    if(!currentUser){
-
-        showOnly("loginPage");
-
-        return;
-
-    }
-
-
-    /*
-       Principal Record alag Admin.html mein hai.
-
-       Monthly Report bhi Principal Record ke andar
-       Admin.html mein rakhi jayegi.
-    */
-
-    window.location.href =
-        "Admin.html";
+    showOnly(loginPage);
 
 };
 
 
 /* =====================================================
-   CAMERA VARIABLES
+   LOAD FACE API MODELS
 ===================================================== */
-
-let registrationStream = null;
-
-let attendanceStream = null;
-
-
-/* =====================================================
-   FACE API
-===================================================== */
-
-let modelsLoaded = false;
-
 
 async function loadFaceModels(){
 
     if(modelsLoaded){
 
         return true;
-
     }
 
 
     try{
 
-        const MODEL_URL =
-            "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+        const modelUrl =
+            "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model";
 
 
-        await Promise.all([
+        await faceapi.nets.tinyFaceDetector.loadFromUri(
+            modelUrl
+        );
 
-            faceapi.nets.tinyFaceDetector.loadFromUri(
-                MODEL_URL
-            ),
+        await faceapi.nets.faceLandmark68Net.loadFromUri(
+            modelUrl
+        );
 
-            faceapi.nets.faceLandmark68Net.loadFromUri(
-                MODEL_URL
-            ),
-
-            faceapi.nets.faceRecognitionNet.loadFromUri(
-                MODEL_URL
-            )
-
-        ]);
+        await faceapi.nets.faceRecognitionNet.loadFromUri(
+            modelUrl
+        );
 
 
         modelsLoaded = true;
 
-
         return true;
 
-
-    }catch(error){
+    }
+    catch(error){
 
         console.error(
-            "Model Error:",
+            "Model loading error:",
             error
         );
 
+        alert(
+            "Face models load nahi ho rahe. Internet check karein."
+        );
 
         return false;
-
     }
 
 }
 
 
 /* =====================================================
-   REGISTRATION CAMERA
+   START REGISTRATION CAMERA
 ===================================================== */
 
 window.startRegistrationCamera =
 async function(){
+
+    if(!currentUser){
+
+        alert(
+            "Pehle Teacher Login karein."
+        );
+
+        showOnly(loginPage);
+
+        return;
+    }
+
 
     const status =
         document.getElementById(
             "registrationStatus"
         );
 
-
-    try{
-
-        stopAttendanceCamera();
-
-
-        const video =
-            document.getElementById(
-                "video"
-            );
-
-
-        registrationStream =
-            await navigator.mediaDevices.getUserMedia({
-
-                video:{
-                    facingMode:"user"
-                },
-
-                audio:false
-
-            });
-
-
-        video.srcObject =
-            registrationStream;
-
-
-        status.innerText =
-            "📷 Camera started";
-
-
-        const loaded =
-            await loadFaceModels();
-
-
-        if(!loaded){
-
-            status.innerText =
-                "❌ Face models load nahi hue.";
-
-            return;
-
-        }
-
-
-        status.innerText =
-            "📷 Camera ready. Face camera ke samne rakhein.";
-
-
-    }catch(error){
-
-        console.error(error);
-
-
-        status.innerText =
-            "❌ Camera permission required.";
-
-    }
-
-};
-
-
-/* =====================================================
-   ATTENDANCE CAMERA
-===================================================== */
-
-window.startAttendanceCamera =
-async function(){
-
-    const status =
+    const video =
         document.getElementById(
-            "attendanceStatus"
+            "registrationVideo"
         );
 
 
     try{
 
-        stopRegistrationCamera();
-
-
-        const video =
-            document.getElementById(
-                "videoAttendance"
-            );
-
-
-        attendanceStream =
-            await navigator.mediaDevices.getUserMedia({
-
-                video:{
-                    facingMode:"user"
-                },
-
-                audio:false
-
-            });
-
-
-        video.srcObject =
-            attendanceStream;
-
-
         status.innerText =
-            "📷 Camera started";
+            "Face model load ho raha hai...";
 
 
         const loaded =
@@ -894,22 +809,52 @@ async function(){
 
         if(!loaded){
 
-            status.innerText =
-                "❌ Face models load nahi hue.";
-
             return;
-
         }
 
 
         status.innerText =
-            "📷 Camera ready. Face camera ke samne rakhein.";
+            "Camera start ho raha hai...";
 
 
-    }catch(error){
+        stopCamera();
 
-        console.error(error);
 
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video:{
+                    facingMode:"user",
+                    width:{
+                        ideal:640
+                    },
+                    height:{
+                        ideal:480
+                    }
+                },
+
+                audio:false
+
+            });
+
+
+        video.srcObject =
+            cameraStream;
+
+
+        await video.play();
+
+
+        status.innerText =
+            "Camera ready. Ab Register My Face dabayein.";
+
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
 
         status.innerText =
             "❌ Camera permission required.";
@@ -920,117 +865,39 @@ async function(){
 
 
 /* =====================================================
-   STOP CAMERAS
-===================================================== */
-
-function stopRegistrationCamera(){
-
-    if(registrationStream){
-
-        registrationStream
-            .getTracks()
-            .forEach(function(track){
-
-                track.stop();
-
-            });
-
-
-        registrationStream = null;
-
-    }
-
-}
-
-
-function stopAttendanceCamera(){
-
-    if(attendanceStream){
-
-        attendanceStream
-            .getTracks()
-            .forEach(function(track){
-
-                track.stop();
-
-            });
-
-
-        attendanceStream = null;
-
-    }
-
-}
-
-
-function stopAllCameras(){
-
-    stopRegistrationCamera();
-
-    stopAttendanceCamera();
-
-}
-
-
-/* =====================================================
-   GET VIDEO
-===================================================== */
-
-function getVideo(id){
-
-    return document.getElementById(id);
-
-}
-
-
-/* =====================================================
-   FACE DESCRIPTOR
+   GET FACE DESCRIPTOR
 ===================================================== */
 
 async function getFaceDescriptor(video){
 
-    if(!video){
+    const options =
+        new faceapi.TinyFaceDetectorOptions({
 
-        return null;
+            inputSize:320,
 
-    }
+            scoreThreshold:0.5
 
-
-    if(video.readyState < 2){
-
-        return null;
-
-    }
+        });
 
 
-    const detection =
+    const result =
         await faceapi
         .detectSingleFace(
-
             video,
-
-            new faceapi.TinyFaceDetectorOptions({
-
-                inputSize:320,
-
-                scoreThreshold:0.5
-
-            })
-
+            options
         )
         .withFaceLandmarks()
         .withFaceDescriptor();
 
 
-    if(!detection){
+    if(!result){
 
         return null;
-
     }
 
 
     return Array.from(
-        detection.descriptor
+        result.descriptor
     );
 
 }
@@ -1043,32 +910,217 @@ async function getFaceDescriptor(video){
 window.registerFace =
 async function(){
 
+    if(!currentUser){
+
+        alert(
+            "Pehle Teacher Login karein."
+        );
+
+        showOnly(loginPage);
+
+        return;
+    }
+
+
     const status =
         document.getElementById(
             "registrationStatus"
         );
 
-
-    /*
-       Login page par dobara nahi bhejna.
-       Current user sirf login ke baad set hota hai.
-    */
-
-    if(!currentUser){
-
-        status.innerText =
-            "❌ Pehle Teacher Login karein.";
-
-        return;
-
-    }
-
-
-    status.innerText =
-        "⏳ Face detect ho raha hai...";
+    const video =
+        document.getElementById(
+            "registrationVideo"
+        );
 
 
     try{
+
+        if(!cameraStream){
+
+            status.innerText =
+                "Pehle Start Camera dabayein.";
+
+            return;
+        }
+
+
+        status.innerText =
+            "Face detect ho raha hai...";
+
+
+        let descriptor = null;
+
+
+        /*
+        Multiple attempts
+        */
+
+        for(
+            let i = 0;
+            i < 8;
+            i++
+        ){
+
+            descriptor =
+                await getFaceDescriptor(
+                    video
+                );
+
+
+            if(descriptor){
+
+                break;
+            }
+
+
+            status.innerText =
+                "Face detect nahi hua. Camera ke samne seedha dekhein...";
+
+
+            await new Promise(
+                resolve =>
+                setTimeout(
+                    resolve,
+                    500
+                )
+            );
+
+        }
+
+
+        if(!descriptor){
+
+            status.innerText =
+                "❌ Face detect nahi hua.";
+
+            return;
+        }
+
+
+        status.innerText =
+            "Face save ho raha hai...";
+
+
+        /*
+        Check existing face
+        */
+
+        const faceQuery =
+            query(
+                collection(
+                    db,
+                    "teacherFaces"
+                ),
+                where(
+                    "name",
+                    "==",
+                    currentUser
+                )
+            );
+
+
+        const existing =
+            await getDocs(
+                faceQuery
+            );
+
+
+        /*
+        Agar pehle se registered hai
+        to duplicate face record nahi banega.
+        */
+
+        if(!existing.empty){
+
+            status.innerText =
+                "✅ Is teacher ka face pehle se registered hai.";
+
+            stopCamera();
+
+            return;
+        }
+
+
+        /*
+        Save face
+        */
+
+        await addDoc(
+            collection(
+                db,
+                "teacherFaces"
+            ),
+            {
+
+                name:
+                    currentUser,
+
+                descriptor:
+                    descriptor,
+
+                createdAt:
+                    serverTimestamp()
+
+            }
+        );
+
+
+        status.innerText =
+            "✅ Face successfully register ho gaya.";
+
+
+        stopCamera();
+
+    }
+    catch(error){
+
+        console.error(
+            error
+        );
+
+        status.innerText =
+            "❌ Face registration failed.";
+
+    }
+
+};
+
+
+/* =====================================================
+   START ATTENDANCE CAMERA
+===================================================== */
+
+window.startAttendanceCamera =
+async function(){
+
+    if(!currentUser){
+
+        alert(
+            "Pehle Teacher Login karein."
+        );
+
+        showOnly(loginPage);
+
+        return;
+    }
+
+
+    const status =
+        document.getElementById(
+            "attendanceStatus"
+        );
+
+    const video =
+        document.getElementById(
+            "attendanceVideo"
+        );
+
+
+    try{
+
+        status.innerText =
+            "Face model load ho raha hai...";
+
 
         const loaded =
             await loadFaceModels();
@@ -1076,104 +1128,54 @@ async function(){
 
         if(!loaded){
 
-            status.innerText =
-                "❌ Face models load nahi hue.";
-
             return;
-
         }
-
-
-        const video =
-            getVideo("video");
-
-
-        const descriptor =
-            await getFaceDescriptor(
-                video
-            );
-
-
-        if(!descriptor){
-
-            status.innerText =
-                "❌ Face detect nahi hua. Face camera ke samne rakhein.";
-
-            return;
-
-        }
-
-
-        /*
-           Check existing registration
-        */
-
-        const q =
-            query(
-
-                collection(
-                    db,
-                    "teacherFaces"
-                ),
-
-                where(
-                    "name",
-                    "==",
-                    currentUser
-                )
-
-            );
-
-
-        const existing =
-            await getDocs(q);
-
-
-        if(!existing.empty){
-
-            status.innerText =
-                "⚠️ Is teacher ka face pehle se registered hai.";
-
-            return;
-
-        }
-
-
-        await addDoc(
-
-            collection(
-                db,
-                "teacherFaces"
-            ),
-
-            {
-
-                name:currentUser,
-
-                descriptor:descriptor,
-
-                createdAt:
-                    serverTimestamp()
-
-            }
-
-        );
 
 
         status.innerText =
-            "✅ Face successfully registered.";
+            "Camera start ho raha hai...";
 
 
-    }catch(error){
+        stopCamera();
+
+
+        cameraStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                video:{
+                    facingMode:"user",
+                    width:{
+                        ideal:640
+                    },
+                    height:{
+                        ideal:480
+                    }
+                },
+
+                audio:false
+
+            });
+
+
+        video.srcObject =
+            cameraStream;
+
+
+        await video.play();
+
+
+        status.innerText =
+            "Camera ready. Ab Mark Attendance dabayein.";
+
+    }
+    catch(error){
 
         console.error(
-            "Registration Error:",
             error
         );
 
-
         status.innerText =
-            "❌ Face registration failed.";
+            "❌ Camera permission required.";
 
     }
 
@@ -1192,22 +1194,14 @@ function euclideanDistance(
     let sum = 0;
 
 
-    const length =
-        Math.min(
-            descriptor1.length,
-            descriptor2.length
-        );
-
-
     for(
         let i = 0;
-        i < length;
+        i < descriptor1.length;
         i++
     ){
 
         const difference =
-            descriptor1[i]
-            -
+            descriptor1[i] -
             descriptor2[i];
 
 
@@ -1230,48 +1224,167 @@ function euclideanDistance(
 window.markAttendance =
 async function(){
 
+    if(!currentUser){
+
+        alert(
+            "Pehle Teacher Login karein."
+        );
+
+        showOnly(loginPage);
+
+        return;
+    }
+
+
     const status =
         document.getElementById(
             "attendanceStatus"
         );
 
-
-    if(!currentUser){
-
-        status.innerText =
-            "❌ Pehle Teacher Login karein.";
-
-        return;
-
-    }
-
-
-    status.innerText =
-        "⏳ Face match ho raha hai...";
+    const video =
+        document.getElementById(
+            "attendanceVideo"
+        );
 
 
     try{
 
-        /*
-           Load models
-        */
-
-        const loaded =
-            await loadFaceModels();
-
-
-        if(!loaded){
+        if(!cameraStream){
 
             status.innerText =
-                "❌ Face models load nahi hue.";
+                "Pehle Start Camera dabayein.";
 
             return;
+        }
+
+
+        status.innerText =
+            "Face match ho raha hai...";
+
+
+        /*
+        Get registered face
+        */
+
+        const faceQuery =
+            query(
+                collection(
+                    db,
+                    "teacherFaces"
+                ),
+                where(
+                    "name",
+                    "==",
+                    currentUser
+                )
+            );
+
+
+        const faceSnapshot =
+            await getDocs(
+                faceQuery
+            );
+
+
+        if(faceSnapshot.empty){
+
+            status.innerText =
+                "❌ Pehle apna face register karein.";
+
+            return;
+        }
+
+
+        const faceDoc =
+            faceSnapshot.docs[0].data();
+
+
+        const registeredDescriptor =
+            faceDoc.descriptor;
+
+
+        /*
+        Detect current face
+        */
+
+        let currentDescriptor =
+            null;
+
+
+        for(
+            let i = 0;
+            i < 10;
+            i++
+        ){
+
+            currentDescriptor =
+                await getFaceDescriptor(
+                    video
+                );
+
+
+            if(currentDescriptor){
+
+                break;
+            }
+
+
+            status.innerText =
+                "Face detect ho raha hai... Camera ke samne seedha dekhein.";
+
+
+            await new Promise(
+                resolve =>
+                setTimeout(
+                    resolve,
+                    500
+                )
+            );
 
         }
 
 
+        if(!currentDescriptor){
+
+            status.innerText =
+                "❌ Face detect nahi hua.";
+
+            return;
+        }
+
+
         /*
-           Current date
+        Match face
+        */
+
+        const distance =
+            euclideanDistance(
+                currentDescriptor,
+                registeredDescriptor
+            );
+
+
+        console.log(
+            "Face distance:",
+            distance
+        );
+
+
+        /*
+        Threshold
+        */
+
+        if(distance > 0.55){
+
+            status.innerText =
+                "❌ Face match nahi hua.";
+
+            return;
+        }
+
+
+        /*
+        Current date/time
         */
 
         const now =
@@ -1281,13 +1394,19 @@ async function(){
         const day =
             String(
                 now.getDate()
-            ).padStart(2,"0");
+            ).padStart(
+                2,
+                "0"
+            );
 
 
         const month =
             String(
-                now.getMonth()+1
-            ).padStart(2,"0");
+                now.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            );
 
 
         const year =
@@ -1309,226 +1428,94 @@ async function(){
 
 
         /*
-           Current camera
+        Duplicate check
+        Same teacher + same date
         */
 
-        const video =
-            getVideo(
-                "videoAttendance"
-            );
-
-
-        if(
-            !video ||
-            !video.srcObject
-        ){
-
-            status.innerText =
-                "❌ Pehle Start Camera dabayein.";
-
-            return;
-
-        }
-
-
-        /*
-           Detect current face FIRST
-        */
-
-        status.innerText =
-            "🔍 Face detect ho raha hai...";
-
-
-        const currentDescriptor =
-            await getFaceDescriptor(
-                video
-            );
-
-
-        if(!currentDescriptor){
-
-            status.innerText =
-                "❌ Face detect nahi hua. Camera ke samne face clear rakhein.";
-
-            return;
-
-        }
-
-
-        /*
-           Get registered face
-        */
-
-        status.innerText =
-            "🔄 Registered face se match ho raha hai...";
-
-
-        const faceQuery =
+        const attendanceQuery =
             query(
-
-                collection(
-                    db,
-                    "teacherFaces"
-                ),
-
-                where(
-                    "name",
-                    "==",
-                    currentUser
-                )
-
-            );
-
-
-        const faceSnapshot =
-            await getDocs(
-                faceQuery
-            );
-
-
-        if(faceSnapshot.empty){
-
-            status.innerText =
-                "❌ Pehle Face Registration karein.";
-
-            return;
-
-        }
-
-
-        const faceDoc =
-            faceSnapshot.docs[0].data();
-
-
-        const registeredDescriptor =
-            faceDoc.descriptor;
-
-
-        /*
-           Face matching
-        */
-
-        const distance =
-            euclideanDistance(
-
-                currentDescriptor,
-
-                registeredDescriptor
-
-            );
-
-
-        console.log(
-            "Face distance:",
-            distance
-        );
-
-
-        /*
-           Threshold
-        */
-
-        if(distance > 0.55){
-
-            status.innerText =
-                "❌ Face match nahi hua.";
-
-            return;
-
-        }
-
-
-        /*
-           Duplicate check
-        */
-
-        status.innerText =
-            "🔍 Attendance check ho rahi hai...";
-
-
-        const duplicateQuery =
-            query(
-
                 collection(
                     db,
                     "attendance"
                 ),
-
                 where(
                     "name",
                     "==",
                     currentUser
                 ),
-
                 where(
                     "date",
                     "==",
                     date
                 )
-
             );
 
 
-        const duplicateSnapshot =
+        const attendanceSnapshot =
             await getDocs(
-                duplicateQuery
+                attendanceQuery
             );
 
 
-        if(!duplicateSnapshot.empty){
+        if(
+            !attendanceSnapshot.empty
+        ){
 
             status.innerText =
-                "⚠️ Aaj ki attendance already marked hai.";
+                "⚠️ Aaj ki attendance pehle hi marked hai.";
+
+            stopCamera();
 
             return;
-
         }
 
 
         /*
-           Save attendance
+        Save attendance
         */
 
         await addDoc(
-
             collection(
                 db,
                 "attendance"
             ),
-
             {
 
-                name:currentUser,
+                name:
+                    currentUser,
 
-                status:"Present",
+                status:
+                    "Present",
 
-                date:date,
+                date:
+                    date,
 
-                time:time,
+                time:
+                    time,
 
                 createdAt:
                     serverTimestamp()
 
             }
-
         );
 
 
         status.innerText =
-            "☁️ Firebase mein save ho gaya. ✅ Attendance Marked";
+            "☁️ Attendance Firebase mein save ho gayi. ✅";
 
 
-    }catch(error){
+        stopCamera();
+
+    }
+    catch(error){
 
         console.error(
             "Attendance Error:",
             error
         );
 
-
         status.innerText =
-            "❌ Attendance failed: " +
-            error.message;
+            "❌ Attendance save nahi hui.";
 
     }
 
@@ -1536,14 +1523,34 @@ async function(){
 
 
 /* =====================================================
-   AUTO OPEN MENU AFTER PAGE LOAD
+   PAGE LOAD
 ===================================================== */
 
 window.addEventListener(
-    "load",
+    "DOMContentLoaded",
     function(){
 
-        if(currentUser){
+        const loggedIn =
+            localStorage.getItem(
+                "teacherLoggedIn"
+            );
+
+
+        const savedName =
+            localStorage.getItem(
+                "teacherName"
+            );
+
+
+        if(
+            loggedIn === "true"
+            &&
+            savedName
+        ){
+
+            currentUser =
+                savedName;
+
 
             document.getElementById(
                 "welcomeText"
@@ -1551,13 +1558,30 @@ window.addEventListener(
                 "Welcome " + currentUser;
 
 
-            showOnly("menuPage");
-
-        }else{
-
-            showOnly("loginPage");
+            showOnly(menuPage);
 
         }
+        else{
+
+            currentUser = "";
+
+            showOnly(loginPage);
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   PAGE CLOSE
+===================================================== */
+
+window.addEventListener(
+    "beforeunload",
+    function(){
+
+        stopAllCameras();
 
     }
 );
