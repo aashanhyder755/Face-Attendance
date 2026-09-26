@@ -48,7 +48,7 @@ h1,h2,h3{
     margin-bottom:20px;
 }
 
-input,select{
+input{
     width:100%;
     padding:13px;
     margin:7px 0 12px;
@@ -83,11 +83,6 @@ button{
     color:white;
 }
 
-.reportBtn{
-    background:#7b1fa2;
-    color:white;
-}
-
 .adminBtn{
     background:#1565c0;
     color:white;
@@ -101,18 +96,6 @@ button{
 .logoutBtn{
     background:#c62828;
     color:white;
-}
-
-.subject{
-    border:1px solid #ddd;
-    padding:12px;
-    border-radius:10px;
-    margin:12px 0;
-}
-
-.subject h3{
-    margin-top:0;
-    color:#1565c0;
 }
 
 video{
@@ -153,7 +136,10 @@ video{
 
 <div class="container">
 
-<!-- ================= LOGIN ================= -->
+
+<!-- =====================================================
+     LOGIN
+===================================================== -->
 
 <div id="loginPage" class="card">
 
@@ -186,12 +172,17 @@ video{
         🔐 Login
     </button>
 
-    <div id="loginStatus" class="status"></div>
+    <div
+        id="loginStatus"
+        class="status"
+    ></div>
 
 </div>
 
 
-<!-- ================= TEACHER MENU ================= -->
+<!-- =====================================================
+     TEACHER MENU
+===================================================== -->
 
 <div id="menuPage" class="card hidden">
 
@@ -201,7 +192,11 @@ video{
         Moon Star Public High School Khanwahan
     </div>
 
-    <div id="welcomeText" class="welcome"></div>
+    <div
+        id="welcomeText"
+        class="welcome"
+    ></div>
+
 
     <button
         class="faceBtn"
@@ -210,6 +205,7 @@ video{
         📷 Face Registration
     </button>
 
+
     <button
         class="attBtn"
         onclick="openPage('markAttendance')"
@@ -217,19 +213,14 @@ video{
         ✅ Mark Attendance
     </button>
 
-    <button
-        class="reportBtn"
-        onclick="openPage('monthlyReport')"
-    >
-        📊 Monthly Report
-    </button>
 
     <button
         class="adminBtn"
         onclick="openPrincipalRecord()"
     >
-        🏫 Principal Record
+        📊 Principal Record
     </button>
+
 
     <button
         class="logoutBtn"
@@ -241,9 +232,14 @@ video{
 </div>
 
 
-<!-- ================= FACE REGISTRATION ================= -->
+<!-- =====================================================
+     FACE REGISTRATION
+===================================================== -->
 
-<div id="faceRegistration" class="card hidden">
+<div
+    id="faceRegistration"
+    class="card hidden"
+>
 
     <h2>👤 Face Registration</h2>
 
@@ -255,12 +251,14 @@ video{
         Apna face camera ke samne rakhein.
     </p>
 
+
     <video
         id="video"
         autoplay
         muted
         playsinline
     ></video>
+
 
     <button
         class="faceBtn"
@@ -269,6 +267,7 @@ video{
         📷 Start Camera
     </button>
 
+
     <button
         class="faceBtn"
         onclick="registerFace()"
@@ -276,10 +275,12 @@ video{
         👤 Register My Face
     </button>
 
+
     <div
         id="registrationStatus"
         class="status"
     ></div>
+
 
     <button
         class="backBtn"
@@ -291,9 +292,14 @@ video{
 </div>
 
 
-<!-- ================= MARK ATTENDANCE ================= -->
+<!-- =====================================================
+     MARK ATTENDANCE
+===================================================== -->
 
-<div id="markAttendance" class="card hidden">
+<div
+    id="markAttendance"
+    class="card hidden"
+>
 
     <h2>✅ Mark Attendance</h2>
 
@@ -305,12 +311,14 @@ video{
         Apna registered face camera ke samne rakhein.
     </p>
 
+
     <video
         id="videoAttendance"
         autoplay
         muted
         playsinline
     ></video>
+
 
     <button
         class="attBtn"
@@ -319,6 +327,7 @@ video{
         📷 Start Camera
     </button>
 
+
     <button
         class="attBtn"
         onclick="markAttendance()"
@@ -326,11 +335,13 @@ video{
         ✅ Mark Attendance
     </button>
 
+
     <div
         id="attendanceStatus"
         class="status"
     ></div>
 
+
     <button
         class="backBtn"
         onclick="openPage('menu')"
@@ -340,283 +351,22 @@ video{
 
 </div>
 
-
-<!-- ================= MONTHLY REPORT ================= -->
-
-<div id="monthlyReport" class="card hidden">
-
-    <h2>📊 Teacher Monthly Report</h2>
-
-    <div class="school">
-        Moon Star Public High School Khanwahan
-    </div>
-
-    <label>Teacher Name:</label>
-
-    <input
-        type="text"
-        id="reportTeacherName"
-        placeholder="Teacher name"
-    >
-
-    <label>Month:</label>
-
-    <select id="reportMonth">
-
-        <option value="">Select Month</option>
-
-        <option>January</option>
-        <option>February</option>
-        <option>March</option>
-        <option>April</option>
-        <option>May</option>
-        <option>June</option>
-        <option>July</option>
-        <option>August</option>
-        <option>September</option>
-        <option>October</option>
-        <option>November</option>
-        <option>December</option>
-
-    </select>
-
-    <label>Class:</label>
-
-    <input
-        type="text"
-        id="reportClass"
-        placeholder="Class"
-    >
-
-
-    <!-- ENGLISH -->
-
-    <div class="subject">
-
-        <h3>English</h3>
-
-        <input
-            type="number"
-            id="englishTotal"
-            placeholder="Total"
-        >
-
-        <input
-            type="number"
-            id="englishRead"
-            placeholder="Read"
-        >
-
-        <input
-            type="number"
-            id="englishWrite"
-            placeholder="Write"
-        >
-
-        <input
-            type="number"
-            id="englishChecked"
-            placeholder="Checked"
-        >
-
-        <input
-            type="number"
-            id="englishUnchecked"
-            placeholder="Unchecked"
-        >
-
-    </div>
-
-
-    <!-- URDU -->
-
-    <div class="subject">
-
-        <h3>Urdu</h3>
-
-        <input
-            type="number"
-            id="urduTotal"
-            placeholder="Total"
-        >
-
-        <input
-            type="number"
-            id="urduRead"
-            placeholder="Read"
-        >
-
-        <input
-            type="number"
-            id="urduWrite"
-            placeholder="Write"
-        >
-
-        <input
-            type="number"
-            id="urduChecked"
-            placeholder="Checked"
-        >
-
-        <input
-            type="number"
-            id="urduUnchecked"
-            placeholder="Unchecked"
-        >
-
-    </div>
-
-
-    <!-- MATH -->
-
-    <div class="subject">
-
-        <h3>Math</h3>
-
-        <input
-            type="number"
-            id="mathTotal"
-            placeholder="Total"
-        >
-
-        <input
-            type="number"
-            id="mathRead"
-            placeholder="Read"
-        >
-
-        <input
-            type="number"
-            id="mathWrite"
-            placeholder="Write"
-        >
-
-        <input
-            type="number"
-            id="mathChecked"
-            placeholder="Checked"
-        >
-
-        <input
-            type="number"
-            id="mathUnchecked"
-            placeholder="Unchecked"
-        >
-
-    </div>
-
-
-    <!-- SINDHI -->
-
-    <div class="subject">
-
-        <h3>Sindhi</h3>
-
-        <input
-            type="number"
-            id="sindhiTotal"
-            placeholder="Total"
-        >
-
-        <input
-            type="number"
-            id="sindhiRead"
-            placeholder="Read"
-        >
-
-        <input
-            type="number"
-            id="sindhiWrite"
-            placeholder="Write"
-        >
-
-        <input
-            type="number"
-            id="sindhiChecked"
-            placeholder="Checked"
-        >
-
-        <input
-            type="number"
-            id="sindhiUnchecked"
-            placeholder="Unchecked"
-        >
-
-    </div>
-
-
-    <!-- S.S. -->
-
-    <div class="subject">
-
-        <h3>S.S.</h3>
-
-        <input
-            type="number"
-            id="ssTotal"
-            placeholder="Total"
-        >
-
-        <input
-            type="number"
-            id="ssRead"
-            placeholder="Read"
-        >
-
-        <input
-            type="number"
-            id="ssWrite"
-            placeholder="Write"
-        >
-
-        <input
-            type="number"
-            id="ssChecked"
-            placeholder="Checked"
-        >
-
-        <input
-            type="number"
-            id="ssUnchecked"
-            placeholder="Unchecked"
-        >
-
-    </div>
-
-
-    <button
-        class="reportBtn"
-        onclick="saveMonthlyReport()"
-    >
-        💾 Save Monthly Report
-    </button>
-
-    <div
-        id="reportStatus"
-        class="status"
-    ></div>
-
-    <button
-        class="backBtn"
-        onclick="openPage('menu')"
-    >
-        ← Back
-    </button>
-
-</div>
 
 </div>
 
 
 <script type="module">
 
-/* =========================================================
+
+/* =====================================================
    FIREBASE
-   ========================================================= */
+===================================================== */
 
 import {
     initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
 
 import {
     getFirestore,
@@ -626,16 +376,13 @@ import {
     query,
     where,
     serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 /*
 =========================================================
-IMPORTANT
-
-YAHAN APNI PURANI WORKING FIREBASE CONFIG RAKHNA.
-
-Apni actual Firebase values yahan paste karein.
+APNI WORKING FIREBASE CONFIG YAHAN RAKHEIN
 =========================================================
 */
 
@@ -661,26 +408,21 @@ const firebaseConfig = {
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+
+const db =
+    getFirestore(app);
 
 
-/* =========================================================
-   LOGIN SETTINGS
-   ========================================================= */
+/* =====================================================
+   LOGIN
+===================================================== */
 
 const LOGIN_EMAIL =
     "ashfaque.thebo@gmail.com";
 
-
-/*
-   SECURITY NOTE:
-
-   Yahan example password diya gaya hai.
-   Agar aap apna password rakhna chahte hain
-   to sirf is value ko GitHub code mein change karein.
-*/
 
 const LOGIN_PASSWORD =
     "123456789";
@@ -690,17 +432,54 @@ let currentUser =
     localStorage.getItem("teacherName") || "";
 
 
-/* =========================================================
-   PAGE FUNCTIONS
-   ========================================================= */
+/* =====================================================
+   PAGE CONTROL
+===================================================== */
 
 window.openPage = function(page){
 
-    if(page !== "login" && !currentUser){
+    /*
+       IMPORTANT:
+       Yahan Face Registration aur Mark Attendance
+       ke liye login check NAHI hai.
+
+       Login ke baad currentUser save hota hai.
+    */
+
+
+    if(
+        page === "faceRegistration" &&
+        !currentUser
+    ){
 
         showOnly("loginPage");
 
         return;
+
+    }
+
+
+    if(
+        page === "markAttendance" &&
+        !currentUser
+    ){
+
+        showOnly("loginPage");
+
+        return;
+
+    }
+
+
+    if(
+        page === "menu" &&
+        !currentUser
+    ){
+
+        showOnly("loginPage");
+
+        return;
+
     }
 
 
@@ -732,17 +511,12 @@ window.openPage = function(page){
 
     }
 
-
-    if(page === "monthlyReport"){
-
-        document.getElementById(
-            "reportTeacherName"
-        ).value = currentUser;
-
-    }
-
 };
 
+
+/* =====================================================
+   SHOW PAGE
+===================================================== */
 
 function showOnly(id){
 
@@ -751,8 +525,7 @@ function showOnly(id){
         "loginPage",
         "menuPage",
         "faceRegistration",
-        "markAttendance",
-        "monthlyReport"
+        "markAttendance"
 
     ];
 
@@ -761,6 +534,7 @@ function showOnly(id){
 
         const element =
             document.getElementById(page);
+
 
         if(element){
 
@@ -774,6 +548,7 @@ function showOnly(id){
     const target =
         document.getElementById(id);
 
+
     if(target){
 
         target.classList.remove("hidden");
@@ -783,9 +558,9 @@ function showOnly(id){
 }
 
 
-/* =========================================================
+/* =====================================================
    LOGIN
-   ========================================================= */
+===================================================== */
 
 window.loginTeacher = function(){
 
@@ -793,6 +568,7 @@ window.loginTeacher = function(){
         document.getElementById(
             "loginEmail"
         ).value.trim();
+
 
     const password =
         document.getElementById(
@@ -806,16 +582,20 @@ window.loginTeacher = function(){
         );
 
 
-    if(email === LOGIN_EMAIL &&
-       password === LOGIN_PASSWORD){
+    if(
+        email === LOGIN_EMAIL &&
+        password === LOGIN_PASSWORD
+    ){
 
-        currentUser = "Ashfaque";
+        currentUser =
+            "Ashfaque";
 
 
         localStorage.setItem(
             "teacherLoggedIn",
             "true"
         );
+
 
         localStorage.setItem(
             "teacherName",
@@ -827,14 +607,15 @@ window.loginTeacher = function(){
             "✅ Login successful";
 
 
+        document.getElementById(
+            "welcomeText"
+        ).innerText =
+            "Welcome " + currentUser;
+
+
         setTimeout(function(){
 
-            document.getElementById(
-                "welcomeText"
-            ).innerText =
-                "Welcome " + currentUser;
-
-            openPage("menu");
+            showOnly("menuPage");
 
         },500);
 
@@ -849,9 +630,9 @@ window.loginTeacher = function(){
 };
 
 
-/* =========================================================
+/* =====================================================
    LOGOUT
-   ========================================================= */
+===================================================== */
 
 window.logoutTeacher = function(){
 
@@ -861,6 +642,7 @@ window.logoutTeacher = function(){
     localStorage.removeItem(
         "teacherLoggedIn"
     );
+
 
     localStorage.removeItem(
         "teacherName"
@@ -873,6 +655,7 @@ window.logoutTeacher = function(){
     document.getElementById(
         "loginEmail"
     ).value = "";
+
 
     document.getElementById(
         "loginPassword"
@@ -889,9 +672,9 @@ window.logoutTeacher = function(){
 };
 
 
-/* =========================================================
+/* =====================================================
    PRINCIPAL RECORD
-   ========================================================= */
+===================================================== */
 
 window.openPrincipalRecord = function(){
 
@@ -904,24 +687,31 @@ window.openPrincipalRecord = function(){
     }
 
 
+    /*
+       Principal Record alag Admin.html mein hai.
+
+       Monthly Report bhi Principal Record ke andar
+       Admin.html mein rakhi jayegi.
+    */
+
     window.location.href =
         "Admin.html";
 
 };
 
 
-/* =========================================================
+/* =====================================================
    CAMERA VARIABLES
-   ========================================================= */
+===================================================== */
 
 let registrationStream = null;
 
 let attendanceStream = null;
 
 
-/* =========================================================
-   FACE API MODELS
-   ========================================================= */
+/* =====================================================
+   FACE API
+===================================================== */
 
 let modelsLoaded = false;
 
@@ -937,18 +727,22 @@ async function loadFaceModels(){
 
     try{
 
+        const MODEL_URL =
+            "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/";
+
+
         await Promise.all([
 
             faceapi.nets.tinyFaceDetector.loadFromUri(
-                "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/"
+                MODEL_URL
             ),
 
             faceapi.nets.faceLandmark68Net.loadFromUri(
-                "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/"
+                MODEL_URL
             ),
 
             faceapi.nets.faceRecognitionNet.loadFromUri(
-                "https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/"
+                MODEL_URL
             )
 
         ]);
@@ -956,12 +750,17 @@ async function loadFaceModels(){
 
         modelsLoaded = true;
 
+
         return true;
 
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "Model Error:",
+            error
+        );
+
 
         return false;
 
@@ -970,9 +769,9 @@ async function loadFaceModels(){
 }
 
 
-/* =========================================================
+/* =====================================================
    REGISTRATION CAMERA
-   ========================================================= */
+===================================================== */
 
 window.startRegistrationCamera =
 async function(){
@@ -1014,7 +813,22 @@ async function(){
             "📷 Camera started";
 
 
-        await loadFaceModels();
+        const loaded =
+            await loadFaceModels();
+
+
+        if(!loaded){
+
+            status.innerText =
+                "❌ Face models load nahi hue.";
+
+            return;
+
+        }
+
+
+        status.innerText =
+            "📷 Camera ready. Face camera ke samne rakhein.";
 
 
     }catch(error){
@@ -1030,9 +844,9 @@ async function(){
 };
 
 
-/* =========================================================
+/* =====================================================
    ATTENDANCE CAMERA
-   ========================================================= */
+===================================================== */
 
 window.startAttendanceCamera =
 async function(){
@@ -1074,7 +888,22 @@ async function(){
             "📷 Camera started";
 
 
-        await loadFaceModels();
+        const loaded =
+            await loadFaceModels();
+
+
+        if(!loaded){
+
+            status.innerText =
+                "❌ Face models load nahi hue.";
+
+            return;
+
+        }
+
+
+        status.innerText =
+            "📷 Camera ready. Face camera ke samne rakhein.";
 
 
     }catch(error){
@@ -1090,9 +919,9 @@ async function(){
 };
 
 
-/* =========================================================
+/* =====================================================
    STOP CAMERAS
-   ========================================================= */
+===================================================== */
 
 function stopRegistrationCamera(){
 
@@ -1100,9 +929,12 @@ function stopRegistrationCamera(){
 
         registrationStream
             .getTracks()
-            .forEach(
-                track => track.stop()
-            );
+            .forEach(function(track){
+
+                track.stop();
+
+            });
+
 
         registrationStream = null;
 
@@ -1117,9 +949,12 @@ function stopAttendanceCamera(){
 
         attendanceStream
             .getTracks()
-            .forEach(
-                track => track.stop()
-            );
+            .forEach(function(track){
+
+                track.stop();
+
+            });
+
 
         attendanceStream = null;
 
@@ -1137,22 +972,20 @@ function stopAllCameras(){
 }
 
 
-/* =========================================================
+/* =====================================================
    GET VIDEO
-   ========================================================= */
+===================================================== */
 
-function getVideo(videoId){
+function getVideo(id){
 
-    return document.getElementById(
-        videoId
-    );
+    return document.getElementById(id);
 
 }
 
 
-/* =========================================================
-   GET FACE DESCRIPTOR
-   ========================================================= */
+/* =====================================================
+   FACE DESCRIPTOR
+===================================================== */
 
 async function getFaceDescriptor(video){
 
@@ -1203,26 +1036,32 @@ async function getFaceDescriptor(video){
 }
 
 
-/* =========================================================
+/* =====================================================
    REGISTER FACE
-   ========================================================= */
+===================================================== */
 
 window.registerFace =
 async function(){
-
-    if(!currentUser){
-
-        alert("Pehle login karein.");
-
-        return;
-
-    }
-
 
     const status =
         document.getElementById(
             "registrationStatus"
         );
+
+
+    /*
+       Login page par dobara nahi bhejna.
+       Current user sirf login ke baad set hota hai.
+    */
+
+    if(!currentUser){
+
+        status.innerText =
+            "❌ Pehle Teacher Login karein.";
+
+        return;
+
+    }
 
 
     status.innerText =
@@ -1265,7 +1104,9 @@ async function(){
         }
 
 
-        /* Check existing registration */
+        /*
+           Check existing registration
+        */
 
         const q =
             query(
@@ -1311,7 +1152,8 @@ async function(){
 
                 descriptor:descriptor,
 
-                createdAt:serverTimestamp()
+                createdAt:
+                    serverTimestamp()
 
             }
 
@@ -1324,7 +1166,10 @@ async function(){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            "Registration Error:",
+            error
+        );
 
 
         status.innerText =
@@ -1335,9 +1180,9 @@ async function(){
 };
 
 
-/* =========================================================
+/* =====================================================
    EUCLIDEAN DISTANCE
-   ========================================================= */
+===================================================== */
 
 function euclideanDistance(
     descriptor1,
@@ -1347,9 +1192,16 @@ function euclideanDistance(
     let sum = 0;
 
 
+    const length =
+        Math.min(
+            descriptor1.length,
+            descriptor2.length
+        );
+
+
     for(
         let i = 0;
-        i < descriptor1.length;
+        i < length;
         i++
     ){
 
@@ -1371,21 +1223,12 @@ function euclideanDistance(
 }
 
 
-/* =========================================================
+/* =====================================================
    MARK ATTENDANCE
-   ========================================================= */
+===================================================== */
 
 window.markAttendance =
 async function(){
-
-    if(!currentUser){
-
-        alert("Pehle login karein.");
-
-        return;
-
-    }
-
 
     const status =
         document.getElementById(
@@ -1393,11 +1236,25 @@ async function(){
         );
 
 
+    if(!currentUser){
+
+        status.innerText =
+            "❌ Pehle Teacher Login karein.";
+
+        return;
+
+    }
+
+
     status.innerText =
         "⏳ Face match ho raha hai...";
 
 
     try{
+
+        /*
+           Load models
+        */
 
         const loaded =
             await loadFaceModels();
@@ -1413,7 +1270,9 @@ async function(){
         }
 
 
-        /* Current date */
+        /*
+           Current date
+        */
 
         const now =
             new Date();
@@ -1449,48 +1308,60 @@ async function(){
             );
 
 
-        /* Duplicate check */
+        /*
+           Current camera
+        */
 
-        const duplicateQuery =
-            query(
-
-                collection(
-                    db,
-                    "attendance"
-                ),
-
-                where(
-                    "name",
-                    "==",
-                    currentUser
-                ),
-
-                where(
-                    "date",
-                    "==",
-                    date
-                )
-
+        const video =
+            getVideo(
+                "videoAttendance"
             );
 
 
-        const duplicateSnapshot =
-            await getDocs(
-                duplicateQuery
-            );
-
-
-        if(!duplicateSnapshot.empty){
+        if(
+            !video ||
+            !video.srcObject
+        ){
 
             status.innerText =
-                "⚠️ Aaj ki attendance already marked hai.";
+                "❌ Pehle Start Camera dabayein.";
 
             return;
 
         }
 
 
-        /* Get registered face */
+        /*
+           Detect current face FIRST
+        */
+
+        status.innerText =
+            "🔍 Face detect ho raha hai...";
+
+
+        const currentDescriptor =
+            await getFaceDescriptor(
+                video
+            );
+
+
+        if(!currentDescriptor){
+
+            status.innerText =
+                "❌ Face detect nahi hua. Camera ke samne face clear rakhein.";
+
+            return;
+
+        }
+
+
+        /*
+           Get registered face
+        */
+
+        status.innerText =
+            "🔄 Registered face se match ho raha hai...";
+
 
         const faceQuery =
             query(
@@ -1533,18 +1404,165 @@ async function(){
             faceDoc.descriptor;
 
 
-        /* Current camera */
+        /*
+           Face matching
+        */
 
-        const video =
-            getVideo(
-                "videoAttendance"
+        const distance =
+            euclideanDistance(
+
+                currentDescriptor,
+
+                registeredDescriptor
+
             );
 
 
-        const currentDescriptor =
-            await getFaceDescriptor(
-                video
+        console.log(
+            "Face distance:",
+            distance
+        );
+
+
+        /*
+           Threshold
+        */
+
+        if(distance > 0.55){
+
+            status.innerText =
+                "❌ Face match nahi hua.";
+
+            return;
+
+        }
+
+
+        /*
+           Duplicate check
+        */
+
+        status.innerText =
+            "🔍 Attendance check ho rahi hai...";
+
+
+        const duplicateQuery =
+            query(
+
+                collection(
+                    db,
+                    "attendance"
+                ),
+
+                where(
+                    "name",
+                    "==",
+                    currentUser
+                ),
+
+                where(
+                    "date",
+                    "==",
+                    date
+                )
+
             );
 
 
-       
+        const duplicateSnapshot =
+            await getDocs(
+                duplicateQuery
+            );
+
+
+        if(!duplicateSnapshot.empty){
+
+            status.innerText =
+                "⚠️ Aaj ki attendance already marked hai.";
+
+            return;
+
+        }
+
+
+        /*
+           Save attendance
+        */
+
+        await addDoc(
+
+            collection(
+                db,
+                "attendance"
+            ),
+
+            {
+
+                name:currentUser,
+
+                status:"Present",
+
+                date:date,
+
+                time:time,
+
+                createdAt:
+                    serverTimestamp()
+
+            }
+
+        );
+
+
+        status.innerText =
+            "☁️ Firebase mein save ho gaya. ✅ Attendance Marked";
+
+
+    }catch(error){
+
+        console.error(
+            "Attendance Error:",
+            error
+        );
+
+
+        status.innerText =
+            "❌ Attendance failed: " +
+            error.message;
+
+    }
+
+};
+
+
+/* =====================================================
+   AUTO OPEN MENU AFTER PAGE LOAD
+===================================================== */
+
+window.addEventListener(
+    "load",
+    function(){
+
+        if(currentUser){
+
+            document.getElementById(
+                "welcomeText"
+            ).innerText =
+                "Welcome " + currentUser;
+
+
+            showOnly("menuPage");
+
+        }else{
+
+            showOnly("loginPage");
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
